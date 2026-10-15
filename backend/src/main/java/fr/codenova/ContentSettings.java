@@ -8,7 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 final class ContentSettings {
     static final Map<String,String> DEFAULTS;
-    private static final Set<String> OPTIONAL=Set.of("registration","capital","hosting","legalExtra");
+    private static final Set<String> OPTIONAL=Set.of("registration","capital","hosting","legalExtra","heroImage");
     static {
         try (var stream=ContentSettings.class.getResourceAsStream("/content-defaults.json")) {
             DEFAULTS=Collections.unmodifiableMap(new ObjectMapper().readValue(stream,new TypeReference<LinkedHashMap<String,String>>(){}));
@@ -22,7 +22,7 @@ final class ContentSettings {
             if((key.matches("service[1-3]Title")||key.equals("formOtherSubject"))&&value.length()>100)bad();
             if(key.startsWith("theme")&&!value.matches("^#[0-9a-fA-F]{6}$"))bad();
             if(key.equals("email")&&!value.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))bad();
-            if(key.startsWith("logo")&&(!value.startsWith("/")||value.startsWith("//")||value.contains("\\")||value.matches(".*[\\s<>].*")))bad();
+            if((key.startsWith("logo")||key.equals("heroImage")||key.equals("socialImage"))&&!value.isBlank()&&(!value.startsWith("/")||value.startsWith("//")||value.contains("\\")||value.matches(".*[\\s<>].*")))bad();
         }
     }
     private static void bad(){throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid site content");}

@@ -24,6 +24,9 @@ services:
       ADMIN_USERNAME: ${ADMIN_USERNAME:?Set ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      MEDIA_DIR: /app/media
+    volumes:
+      - media_data:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -35,3 +38,4 @@ services:
     depends_on: [backend]
 volumes:
   postgres_data:
+  media_data:

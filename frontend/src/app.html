@@ -54,41 +54,51 @@
         class="hero-art"
         aria-label="Illustration d’une architecture numérique"
       >
-        <div class="art-grid"></div>
-        <div class="art-top">
-          <span>{{ t("artLabel") }}</span
-          ><span>01 — ∞</span>
-        </div>
-        <div class="orbit orbit-one"></div>
-        <div class="orbit orbit-two"></div>
-        <div class="orbit orbit-three"></div>
-        <div class="core" aria-hidden="true">
-          <img [src]="t('logoIcon')" alt="" width="220" height="220" />
-        </div>
-        <div class="code-window" aria-hidden="true">
-          <div class="window-bar">
-            <i></i><i></i><i></i><span>vision.ts</span>
+        @if (t("heroImage")) {
+          <img
+            class="hero-custom-image"
+            [src]="t('heroImage')"
+            [alt]="t('heroImageAlt')"
+          />
+        } @else {
+          <div class="art-grid"></div>
+          <div class="art-top">
+            <span>{{ t("artLabel") }}</span
+            ><span>01 — ∞</span>
           </div>
-          <div class="code-lines">
-            <span class="code-purple">const</span> future = &#123;<br />&nbsp;
-            vision: <span class="code-cyan">'votre ambition'</span>,<br />&nbsp;
-            expertise: <span class="code-cyan">'notre code'</span>,<br />&nbsp;
-            possibilities: <span class="code-purple">Infinity</span
-            ><br />&#125;;<br /><span class="code-comment"
-              >// Construisons la suite.</span
-            >
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="orbit orbit-three"></div>
+          <div class="core" aria-hidden="true">
+            <img [src]="t('logoIcon')" alt="" width="220" height="220" />
           </div>
-        </div>
-        <div class="floating-tag tag-one">
-          <span class="tag-icon">&lt;/&gt;</span>{{ t("artTag1") }}
-        </div>
-        <div class="floating-tag tag-two">
-          <span class="green-dot"></span>{{ t("artTag2") }}
-        </div>
-        <div class="art-bottom">
-          <span class="editorial">{{ t("artFooter") }}</span
-          ><span class="art-arrow">→</span>
-        </div>
+          <div class="code-window" aria-hidden="true">
+            <div class="window-bar">
+              <i></i><i></i><i></i><span>vision.ts</span>
+            </div>
+            <div class="code-lines">
+              <span class="code-purple">const</span> future = &#123;<br />&nbsp;
+              vision:
+              <span class="code-cyan">'votre ambition'</span>,<br />&nbsp;
+              expertise:
+              <span class="code-cyan">'notre code'</span>,<br />&nbsp;
+              possibilities: <span class="code-purple">Infinity</span
+              ><br />&#125;;<br /><span class="code-comment"
+                >// Construisons la suite.</span
+              >
+            </div>
+          </div>
+          <div class="floating-tag tag-one">
+            <span class="tag-icon">&lt;/&gt;</span>{{ t("artTag1") }}
+          </div>
+          <div class="floating-tag tag-two">
+            <span class="green-dot"></span>{{ t("artTag2") }}
+          </div>
+          <div class="art-bottom">
+            <span class="editorial">{{ t("artFooter") }}</span
+            ><span class="art-arrow">→</span>
+          </div>
+        }
       </div>
     </section>
     <div class="expertise-band">
@@ -494,6 +504,161 @@
                     />Disponible pour de nouveaux projets</label
                   >
                 </fieldset>
+                @if (showMediaEditor) {
+                  <details class="editor-group media-editor">
+                    <summary>
+                      Images et logos
+                      <span>4 emplacements · originaux conservés</span>
+                    </summary>
+                    <p>
+                      Ajoutez une image ou sélectionnez un fichier de la
+                      bibliothèque. Le remplacement n’est publié qu’après
+                      l’enregistrement du contenu.
+                    </p>
+                    <p class="media-limits">
+                      PNG, JPEG et SVG simples · 4 Mo par fichier · 50 fichiers
+                      / 50 Mo au total.
+                    </p>
+                    @if (mediaFeedback) {
+                      <p
+                        class="media-feedback"
+                        [class.media-failed]="mediaError"
+                        [attr.role]="mediaError ? 'alert' : 'note'"
+                      >
+                        {{ mediaFeedback }}
+                      </p>
+                    }
+                    <div class="media-slots">
+                      @for (slot of mediaSlots; track slot.key) {
+                        <article class="media-slot">
+                          <div class="media-image">
+                            <img
+                              [src]="draft.settings[slot.key] || slot.preview"
+                              [alt]="'Aperçu — ' + slot.label"
+                              loading="lazy"
+                            />
+                          </div>
+                          <h3>{{ slot.label }}</h3>
+                          <p>{{ slot.description }}</p>
+                          <label
+                            >Image sélectionnée — {{ slot.label
+                            }}<select
+                              [name]="'media-' + slot.key"
+                              [(ngModel)]="draft.settings[slot.key]"
+                            >
+                              <option [value]="slot.defaultUrl">
+                                Image d’origine{{
+                                  slot.key === "heroImage"
+                                    ? " — illustration animée"
+                                    : ""
+                                }}
+                              </option>
+                              @if (mediaCustomPath(slot)) {
+                                <option [value]="draft.settings[slot.key]">
+                                  Image personnalisée actuelle
+                                </option>
+                              }
+                              @for (asset of media; track asset.id) {
+                                <option [value]="asset.url">
+                                  {{ asset.originalName }}
+                                </option>
+                              }
+                            </select></label
+                          >
+                          <label class="media-file"
+                            >Téléverser pour {{ slot.label
+                            }}<input
+                              type="file"
+                              accept="image/png,image/jpeg,image/svg+xml,.svg"
+                              [attr.aria-label]="
+                                'Téléverser pour ' + slot.label
+                              "
+                              [disabled]="uploading"
+                              (change)="uploadMedia($event, slot)"
+                          /></label>
+                          <button
+                            type="button"
+                            class="button"
+                            (click)="restoreMedia(slot)"
+                            [disabled]="
+                              draft.settings[slot.key] === slot.defaultUrl
+                            "
+                          >
+                            Restaurer — {{ slot.label }}
+                          </button>
+                        </article>
+                      }
+                    </div>
+                    <div class="media-toolbar">
+                      <button
+                        type="button"
+                        class="button"
+                        (click)="restoreAllMedia()"
+                      >
+                        Restaurer toutes les images d’origine</button
+                      ><button
+                        type="button"
+                        class="button"
+                        (click)="loadMedia()"
+                      >
+                        Actualiser la bibliothèque
+                      </button>
+                    </div>
+                    <h3>Votre bibliothèque</h3>
+                    <label class="media-file"
+                      >Ajouter une image à la bibliothèque<input
+                        type="file"
+                        accept="image/png,image/jpeg,image/svg+xml,.svg"
+                        [disabled]="uploading"
+                        (change)="uploadMedia($event)"
+                    /></label>
+                    @if (uploading) {
+                      <p role="note">
+                        Téléversement et vérification de l’image…
+                      </p>
+                    }
+                    <div class="media-library">
+                      @for (asset of media; track asset.id) {
+                        <article class="media-asset">
+                          <img
+                            [src]="asset.url"
+                            [alt]="asset.originalName"
+                            loading="lazy"
+                          />
+                          <div>
+                            <strong>{{ asset.originalName }}</strong
+                            ><small
+                              >{{ (asset.sizeBytes / 1024).toFixed(0) }} Ko ·
+                              {{ asset.createdAt.slice(0, 10) }}</small
+                            >
+                            @if (mediaInUse(asset)) {
+                              <small
+                                >Utilisée sur le site ou sélectionnée dans le
+                                brouillon.</small
+                              >
+                            }
+                          </div>
+                          <button
+                            type="button"
+                            class="button"
+                            [disabled]="mediaInUse(asset)"
+                            (click)="deleteMedia(asset)"
+                            [attr.aria-label]="
+                              'Supprimer ' + asset.originalName
+                            "
+                          >
+                            Supprimer
+                          </button>
+                        </article>
+                      } @empty {
+                        <p>
+                          Aucune image ajoutée. Vos images d’origine sont
+                          toujours disponibles.
+                        </p>
+                      }
+                    </div>
+                  </details>
+                }
                 @for (group of filteredGroups; track group.id) {
                   <details
                     class="editor-group"
@@ -601,21 +766,14 @@
                               [maxlength]="field.maxLength"
                             />
                           }
-                          @if (
-                            field.key === "logoIcon" || field.key === "logoFull"
-                          ) {
-                            <small
-                              >Chemin d’une image déjà hébergée sur le site, par
-                              exemple /logo.svg. Le téléversement de fichiers
-                              n’est pas inclus.</small
-                            >
-                          }
                         </label>
                       }
                     </fieldset>
                   </details>
                 } @empty {
-                  <p>Aucun champ ne correspond à votre recherche.</p>
+                  @if (!showMediaEditor) {
+                    <p>Aucun champ ne correspond à votre recherche.</p>
+                  }
                 }
                 <div class="editor-actions">
                   @if (saveFeedback) {

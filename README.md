@@ -7,7 +7,7 @@ Site vitrine en français pour CodeNova, SASU de conseil en systèmes et logicie
 - Identité graphique futuriste bleu nuit, violet et cyan, logo SVG inspiré des chevrons de code, mise en page responsive et polices auto-hébergées. Animations lentes du noyau et des orbites, apparition de l’accueil et réactions au survol ; désactivation via `prefers-reduced-motion`.
 - Présentation, expertises, approche, adresse et itinéraire OpenStreetMap, téléphone et e-mail.
 - Formulaire avec validation côté navigateur et serveur, consentement obligatoire, champ anti-robot et limitation des envois.
-- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, onglet « Contenu du site » séparé des messages, avec recherche et édition de 99 champs publics, du titre de présentation, de l’introduction et de la disponibilité.
+- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, onglet « Contenu du site » séparé des messages, avec recherche et édition de textes et paramètres publics, du titre de présentation, de l’introduction et de la disponibilité.
 - Mot de passe BCrypt, protection CSRF des opérations authentifiées, cookie de session HttpOnly / SameSite Strict, aucune inscription publique.
 - PostgreSQL et migrations Flyway. Purge quotidienne des messages de plus de 365 jours.
 - Accueil prérendu, HTML sémantique, métadonnées et données structurées ProfessionalService, robots.txt, image de partage et génération du sitemap une fois le domaine choisi.
@@ -105,7 +105,7 @@ Le titre, l’introduction et la disponibilité existants sont préservés par l
 
 Les modifications sont visibles après rechargement du site public, sans redéploiement. L’e-mail, le téléphone et l’adresse actualisent aussi les liens correspondants. Le titre SEO, la description, le favicon et les données structurées sont actualisés dans le navigateur. Le HTML prérendu fourni avant l’exécution JavaScript reste un instantané de construction ; son actualisation pour les robots sans JavaScript nécessite une étape de publication adaptée (voir la section référencement ci-dessus).
 
-Les logos se configurent par un chemin de fichier déjà hébergé sur le site (`/logo.svg`, `/logo-full.svg`). Le téléversement de fichiers et le changement du nombre de cartes/sections ne font pas partie de cet éditeur ; les trois expertises et les trois étapes sont modifiables. Les identifiants administrateur, les paramètres de base de données et la rétention automatique des messages restent des paramètres serveur.
+La rubrique « Images et logos » permet de téléverser, sélectionner et restaurer les images d’origine. Le changement du nombre de cartes/sections ne fait pas partie de cet éditeur ; les trois expertises et les trois étapes sont modifiables. Les identifiants administrateur, les paramètres de base de données et la rétention automatique des messages restent des paramètres serveur.
 
 Pour déployer une version modifiant l’API ou la base, reconstruire **les deux applications** :
 
@@ -135,3 +135,16 @@ Exécuter `./scripts/diagnose-auth.sh` (ou passer un autre nom de projet Compose
 Le formulaire distingue les identifiants refusés (401), le jeton de sécurité refusé (403), la limitation des tentatives (429), le backend indisponible (502/503/504) et une session qui n’est pas conservée après acceptation des identifiants. Une recréation du backend invalide les sessions existantes ; les identifiants proviennent du `.env` de ce serveur. `COOKIE_SECURE=true` exige un accès HTTPS et empêche la conservation de la session sur une adresse HTTP.
 
 Le proxy Nginx utilise le résolveur DNS interne Docker et renouvelle l’adresse du backend toutes les cinq secondes. Cela évite de conserver l’ancienne IP après une recréation du backend. Vérification de diagnostic : si les API via Nginx renvoient 502 mais que le contrôle direct `web -> backend` réussit, le proxy doit être rechargé ou reconstruit avec la configuration actuelle. Si le contrôle direct échoue aussi, vérifier l’état et les logs du backend.
+
+
+## Médiathèque et restauration des originaux
+
+Dans **Contenu du site → Images et logos**, gérer le symbole d’en-tête/pied de page/favicon, le logo de présentation, le visuel d’accueil et l’image de partage. Le téléversement ajoute un fichier à la bibliothèque et le sélectionne dans le brouillon. **Enregistrer les modifications** publie la sélection. Les images personnalisées de l’accueil remplacent l’illustration animée, qui revient avec la restauration de cet emplacement.
+
+Les originaux `/logo.svg`, `/logo-full.svg` et `/social-card.png` restent livrés dans le frontend et ne sont jamais écrasés par un téléversement. « Restaurer » et « Restaurer toutes les images d’origine » sélectionnent ces originaux dans le brouillon, sans supprimer les fichiers ajoutés. Une image publiée ou sélectionnée ne peut pas être supprimée depuis l’interface ; remplacer la sélection et enregistrer d’abord pour libérer l’ancienne image. Une suppression manuelle d’un fichier inutilisé est définitive.
+
+Formats acceptés : PNG, JPEG et SVG simples, au maximum 4 Mo et 16 millions de pixels pour les images matricielles. Les PNG/JPEG sont décodés et réencodés ; les SVG sont analysés sans DTD, scripts, gestionnaires d’événements ou ressources externes. Les fichiers portent des identifiants uniques et sont servis par l’API. La bibliothèque est limitée à 50 fichiers et 50 Mo pour contenir l’usage du disque. Un manque d’espace ou un volume non accessible est signalé dans l’interface.
+
+Les métadonnées sont conservées dans PostgreSQL (migration Flyway V3), et les fichiers dans le volume Docker `codenova-recette_media_data` monté dans `/app/media`. **Sauvegarder la base et ce volume ensemble** ; ne pas utiliser `docker compose down -v` pour une simple mise à jour. Le conteneur de production utilise l’UID/GID stable 10001, et son dossier de médias est préparé avec les droits correspondants. Le profil de recette automatisé a son propre volume et une initialisation explicite des permissions. En développement hors Docker, les médias sont dans `.local/media` (ignoré par Git), ou le dossier défini par `MEDIA_DIR`.
+
+Le remplacement d’une image conserve son ancien fichier dans la bibliothèque jusqu’à suppression explicite. Une image déjà ouverte dans un onglet doit être rechargée pour recevoir la nouvelle sélection. L’image de partage est actualisée dans les métadonnées du navigateur ; les limites du HTML prérendu décrites plus haut restent applicables aux robots de partage sans JavaScript.

@@ -1,3 +1,4 @@
+import { MediaAsset, MediaSlot, mediaSlots } from "./media";
 import { themeFields, validColor, contrast, accentText } from "./theme";
 import { Component, ChangeDetectorRef, inject, OnInit } from "@angular/core";
 import { SiteContent, contentDefaults, contentGroups } from "./content-model";
@@ -36,6 +37,146 @@ export class App implements OnInit {
   draft: SiteContent = structuredClone(this.content);
   adminTab: "messages" | "content" = "messages";
   groups = contentGroups;
+  mediaSlots = mediaSlots;
+  media: MediaAsset[] = [];
+  mediaLoaded = false;
+  uploading = false;
+  mediaFeedback = "";
+  mediaError = false;
+  get showMediaEditor(): boolean {
+    const q = this.contentSearch.trim().toLocaleLowerCase("fr");
+    return (
+      !q ||
+      ["image", "logo", "visuel", "média", "media", "partage"].some((word) =>
+        q.includes(word),
+      )
+    );
+  }
+  mediaCustomPath(slot: MediaSlot): boolean {
+    const url = this.draft.settings[slot.key];
+    return (
+      !!url &&
+      url !== slot.defaultUrl &&
+      !this.media.some((asset) => asset.url === url)
+    );
+  }
+  mediaInUse(asset: MediaAsset): boolean {
+    return [this.content, this.draft].some((content) =>
+      Object.values(content.settings).some(
+        (value) => value === asset.url || value.startsWith(asset.url + "?"),
+      ),
+    );
+  }
+  restoreMedia(slot: MediaSlot): void {
+    this.draft.settings[slot.key] = slot.defaultUrl;
+    this.mediaError = false;
+    this.mediaFeedback =
+      "L’image d’origine est sélectionnée dans le brouillon. Enregistrez les modifications pour la publier.";
+  }
+  restoreAllMedia(): void {
+    if (
+      !confirm(
+        "Rétablir les images d’origine dans votre brouillon ? Vos fichiers ajoutés restent dans la médiathèque.",
+      )
+    )
+      return;
+    for (const slot of this.mediaSlots)
+      this.draft.settings[slot.key] = slot.defaultUrl;
+    this.mediaError = false;
+    this.mediaFeedback =
+      "Images d’origine sélectionnées. Enregistrez les modifications pour les publier.";
+  }
+  async mediaErrorText(response: Response): Promise<string> {
+    try {
+      const body = await response.json();
+      if (typeof body.message === "string") return body.message;
+    } catch {}
+    return response.status === 401 || response.status === 403
+      ? "Votre session ne permet plus cette action. Reconnectez-vous."
+      : response.status === 413
+        ? "L’image dépasse la limite de 4 Mo."
+        : "Action impossible (HTTP " + response.status + ").";
+  }
+  async loadMedia(): Promise<void> {
+    try {
+      const r = await fetch("/api/admin/media", { cache: "no-store" });
+      if (!r.ok) throw Error(await this.mediaErrorText(r));
+      this.media = await r.json();
+      this.mediaLoaded = true;
+    } catch (error) {
+      this.mediaError = true;
+      this.mediaFeedback =
+        error instanceof Error ? error.message : "Médiathèque indisponible.";
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
+  async uploadMedia(event: Event, slot?: MediaSlot): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.mediaFeedback = "";
+    this.mediaError = false;
+    if (file.size > 4 * 1024 * 1024) {
+      this.mediaError = true;
+      this.mediaFeedback = "Choisissez une image de 4 Mo maximum.";
+      input.value = "";
+      return;
+    }
+    this.uploading = true;
+    try {
+      const data = new FormData();
+      data.append("file", file);
+      const response = await fetch("/api/admin/media", {
+        method: "POST",
+        headers: { "X-XSRF-TOKEN": this.csrf },
+        body: data,
+      });
+      if (!response.ok) throw Error(await this.mediaErrorText(response));
+      const asset: MediaAsset = await response.json();
+      this.media = [asset, ...this.media];
+      if (slot) this.draft.settings[slot.key] = asset.url;
+      this.mediaFeedback = slot
+        ? "Image ajoutée et sélectionnée dans le brouillon. Enregistrez pour la publier."
+        : "Image ajoutée à la médiathèque. Vous pouvez maintenant la sélectionner.";
+    } catch (error) {
+      this.mediaError = true;
+      this.mediaFeedback =
+        error instanceof Error
+          ? error.message
+          : "Téléversement impossible. Réessayez.";
+    } finally {
+      this.uploading = false;
+      input.value = "";
+      this.cdr.markForCheck();
+    }
+  }
+  async deleteMedia(asset: MediaAsset): Promise<void> {
+    if (
+      this.mediaInUse(asset) ||
+      !confirm(
+        "Supprimer définitivement cette image inutilisée de la médiathèque ?",
+      )
+    )
+      return;
+    try {
+      const response = await fetch("/api/admin/media/" + asset.id, {
+        method: "DELETE",
+        headers: { "X-XSRF-TOKEN": this.csrf },
+      });
+      if (!response.ok) throw Error(await this.mediaErrorText(response));
+      this.media = this.media.filter((item) => item.id !== asset.id);
+      this.mediaError = false;
+      this.mediaFeedback = "Image supprimée.";
+    } catch (error) {
+      this.mediaError = true;
+      this.mediaFeedback =
+        error instanceof Error ? error.message : "Suppression impossible.";
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
+
   contentSearch = "";
   saving = false;
   saveFeedback = "";
@@ -123,6 +264,7 @@ export class App implements OnInit {
   }
   switchTab(tab: "messages" | "content", focus = false): void {
     this.adminTab = tab;
+    if (tab === "content" && !this.mediaLoaded) void this.loadMedia();
     if (focus) document.getElementById("tab-" + tab)?.focus();
   }
   get hasUnsavedChanges(): boolean {
@@ -225,6 +367,19 @@ export class App implements OnInit {
       document.querySelector(selector)?.setAttribute("content", value);
     const icon = document.querySelector('link[rel="icon"]');
     icon?.setAttribute("href", this.t("logoIcon"));
+    icon?.removeAttribute("type");
+    let social = document.querySelector<HTMLMetaElement>(
+      'meta[property="og:image"]',
+    );
+    if (!social) {
+      social = document.createElement("meta");
+      social.setAttribute("property", "og:image");
+      document.head.appendChild(social);
+    }
+    social.content = new URL(
+      this.t("socialImage"),
+      window.location.origin,
+    ).toString();
     const schema = document.querySelector('script[type="application/ld+json"]');
     if (schema)
       schema.textContent = JSON.stringify({

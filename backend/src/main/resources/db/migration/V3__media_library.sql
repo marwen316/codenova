@@ -1,0 +1,8 @@
+CREATE TABLE media_asset (
+ id VARCHAR(36) PRIMARY KEY,
+ filename VARCHAR(48) NOT NULL UNIQUE,
+ original_name VARCHAR(200) NOT NULL,
+ content_type VARCHAR(40) NOT NULL,
+ size_bytes BIGINT NOT NULL,
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL
+);

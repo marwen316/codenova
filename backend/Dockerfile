@@ -6,7 +6,8 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-RUN addgroup -S codenova && adduser -S codenova -G codenova
+RUN addgroup -g 10001 -S codenova && adduser -u 10001 -S codenova -G codenova \
+    && mkdir -p /app/media && chown codenova:codenova /app/media
 USER codenova
 COPY --from=build /app/target/codenova-1.0.0.jar app.jar
 EXPOSE 8080

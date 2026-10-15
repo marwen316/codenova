@@ -7,3 +7,4 @@ target/
 *.log
 test-results/
 playwright-report/
+.local/

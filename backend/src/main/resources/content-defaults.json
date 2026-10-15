@@ -97,5 +97,8 @@
   "themeBackground": "#080b16",
   "themeSurface": "#11182a",
   "themeText": "#eef0ff",
-  "themeMuted": "#a0a8c3"
+  "themeMuted": "#a0a8c3",
+  "heroImage": "",
+  "heroImageAlt": "Illustration de l’expertise informatique de CodeNova",
+  "socialImage": "/social-card.png"
 }

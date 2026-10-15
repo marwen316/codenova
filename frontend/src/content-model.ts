@@ -122,6 +122,9 @@ export const contentDefaults: Record<string, string> = {
     "Le formulaire recueille votre nom, votre e-mail, votre entreprise et votre message afin de répondre à votre demande, sur la base de votre consentement. Seul l’administrateur accède à ces informations. Aucun traceur publicitaire n’est utilisé. Un cookie de session strictement nécessaire est utilisé pour l’espace administrateur.\n\nLes messages sont conservés au maximum 12 mois. Vous pouvez demander leur accès, rectification ou suppression, ou retirer votre consentement, aux coordonnées ci-dessous. Vous pouvez introduire une réclamation auprès de la CNIL.",
   logoIcon: "/logo.svg",
   logoFull: "/logo-full.svg",
+  heroImage: "",
+  heroImageAlt: "Illustration de l’expertise informatique de CodeNova",
+  socialImage: "/social-card.png",
   seoTitle: "CodeNova — Conseil & ingénierie logicielle à Sartrouville",
   seoDescription:
     "CodeNova accompagne votre transformation numérique : conseil en systèmes informatiques, développement web et architecture logicielle à Sartrouville, en Île-de-France.",
@@ -837,3 +840,18 @@ contentGroups.push({
     required: true,
   })),
 });
+
+// Images are selected in the media library, rather than edited as arbitrary paths.
+for (const group of contentGroups)
+  group.fields = group.fields.filter(
+    (field) => !["logoIcon", "logoFull"].includes(field.key),
+  );
+contentGroups
+  .find((group) => group.id === "branding")
+  ?.fields.push({
+    key: "heroImageAlt",
+    label: "Description du visuel d’accueil (accessibilité)",
+    type: "text",
+    maxLength: 500,
+    required: true,
+  });
