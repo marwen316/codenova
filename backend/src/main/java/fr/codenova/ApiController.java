@@ -15,7 +15,7 @@ private final MessageRepository messages; private final ContentRepository conten
 private final Map<String,Deque<Instant>> attempts=new HashMap<>();
 public ApiController(MessageRepository m,ContentRepository c){messages=m;content=c;}
 public record Contact(@NotBlank @Size(max=120) String name,@NotBlank @Email @Size(max=254) String email,@Size(max=160) String company,@NotBlank @Size(max=100) String subject,@NotBlank @Size(min=10,max=5000) String message,@AssertTrue boolean consent,@Size(max=500) String website){}
-public record Content(@NotBlank @Size(max=100) String headline,@NotBlank @Size(max=500) String intro,boolean available,@Size(max=128) Map<@NotBlank String,@NotNull @Size(max=5000) String> settings){}
+public record Content(@NotBlank @Size(max=100) String headline,@NotBlank @Size(max=500) String intro,boolean available,@Size(max=128) Map<@NotBlank String,@NotNull @Size(max=30000) String> settings){}
 @GetMapping("/csrf") public Map<String,String> csrf(CsrfToken token){return Map.of("token",token.getToken());}
 @GetMapping("/content") public SiteContent content(){SiteContent c=content.findById(1L).orElseThrow();Map<String,String> merged=new LinkedHashMap<>(ContentSettings.DEFAULTS);merged.putAll(c.settings);c.settings=merged;return c;}
 @PostMapping("/contact") @ResponseStatus(HttpStatus.CREATED) public void contact(@Valid @RequestBody Contact input,HttpServletRequest request){

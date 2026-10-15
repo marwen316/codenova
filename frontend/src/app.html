@@ -121,25 +121,21 @@
         <p class="editorial">{{ t("servicesIntro") }}</p>
       </div>
       <div class="cards">
-        @for (index of [1, 2, 3]; track index) {
-          <article class="service" [class.featured]="index === 2">
+        @for (card of serviceCards(); track card.id; let index = $index) {
+          <article class="service" [class.featured]="index === 1">
             <div class="service-top">
-              <span class="service-icon">{{
-                index === 1 ? "⌁" : index === 2 ? "&lt;/&gt;" : "▧"
-              }}</span
-              ><span>0{{ index }}</span>
+              <span class="service-icon">{{ card.icon }}</span><span>{{ index + 1 }}</span>
             </div>
-            <h3>{{ t("service" + index + "Title") }}</h3>
-            <p class="editorial">{{ t("service" + index + "Description") }}</p>
+            <h3>{{ card.title }}</h3>
+            <p class="editorial">{{ card.description }}</p>
             <div class="service-footer">
-              <span>{{ t("service" + index + "Tags") }}</span
-              ><a
-                href="#contact"
+              <span>{{ card.tags }}</span
+              >@if (card.link) {<a
+                [href]="card.link"
                 [attr.aria-label]="
-                  'Discuter de ' + t('service' + index + 'Title')
+                  'En savoir plus : ' + card.title
                 "
-                >→</a
-              >
+                >→</a>}
             </div>
           </article>
         }
@@ -249,9 +245,9 @@
         ><label
           >{{ t("formSubject")
           }}<select name="subject" [(ngModel)]="form.subject">
-            @for (index of [2, 1, 3]; track index) {
-              <option [value]="t('service' + index + 'Title')">
-                {{ t("service" + index + "Title") }}
+            @for (card of serviceCards(); track card.id) {
+              <option [value]="card.title">
+                {{ card.title }}
               </option>
             }
             <option>{{ t("formOtherSubject") }}</option>
@@ -504,6 +500,24 @@
                     />Disponible pour de nouveaux projets</label
                   >
                 </fieldset>
+                <details class="editor-group" open>
+                  <summary>Rubriques des expertises <span>{{ serviceCards(draft.settings).length }} / 12 rubriques</span></summary>
+                  <p>Modifiez les cartes « Vos enjeux. Notre terrain de jeu. ». Enregistrez pour publier vos modifications.</p>
+                  @for (card of serviceCards(draft.settings); track card.id) {
+                    <fieldset>
+                      <legend>{{ card.title }}</legend>
+                      <label>Titre de la rubrique<input [name]="card.id + '-title'" [ngModel]="card.title" (ngModelChange)="editService(card.id, 'title', $event)" required maxlength="100" /></label>
+                      <label>Contenu de la rubrique<textarea [name]="card.id + '-description'" [ngModel]="card.description" (ngModelChange)="editService(card.id, 'description', $event)" required maxlength="1500" rows="4"></textarea></label>
+                      <label>Mots-clés de la rubrique<input [name]="card.id + '-tags'" [ngModel]="card.tags" (ngModelChange)="editService(card.id, 'tags', $event)" maxlength="150" /></label>
+                      <label>Symbole de la rubrique<input [name]="card.id + '-icon'" [ngModel]="card.icon" (ngModelChange)="editService(card.id, 'icon', $event)" maxlength="12" /></label>
+                      <label>Lien de la rubrique<input [name]="card.id + '-link'" [ngModel]="card.link" (ngModelChange)="editService(card.id, 'link', $event)" maxlength="500" placeholder="#contact ou https://exemple.fr" /></label>
+                      <small>Lien interne (/page), ancre (#contact), http(s), mailto ou tel. Laissez vide pour masquer le lien.</small>
+                      @if (!validServiceLink(card.link)) { <p role="alert">Ce lien n’est pas valide.</p> }
+                      <button type="button" class="button" (click)="removeService(card.id)">Supprimer cette rubrique</button>
+                    </fieldset>
+                  }
+                  <button type="button" class="button" (click)="addService()" [disabled]="serviceCards(draft.settings).length >= 12">Ajouter une rubrique</button>
+                </details>
                 @if (showMediaEditor) {
                   <details class="editor-group media-editor">
                     <summary>
@@ -797,7 +811,7 @@
                     type="submit"
                     class="button lime"
                     [disabled]="
-                      editorForm.invalid || saving || !hasUnsavedChanges
+                      editorForm.invalid || invalidServiceLinks || saving || !hasUnsavedChanges
                     "
                   >
                     {{

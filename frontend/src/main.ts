@@ -3,6 +3,7 @@ import { themeFields, validColor, contrast, accentText } from "./theme";
 import { Component, ChangeDetectorRef, inject, OnInit } from "@angular/core";
 import { SiteContent, contentDefaults, contentGroups } from "./content-model";
 import { FormsModule } from "@angular/forms";
+interface ServiceCard { id: string; title: string; description: string; tags: string; icon: string; link: string; }
 interface Message {
   id: number;
   name: string;
@@ -36,6 +37,34 @@ export class App implements OnInit {
   };
   draft: SiteContent = structuredClone(this.content);
   adminTab: "messages" | "content" = "messages";
+  serviceCards(settings = this.content.settings): ServiceCard[] {
+    if (settings["serviceCards"]) return JSON.parse(settings["serviceCards"]);
+    return [1, 2, 3].map((index) => ({id: "original-" + index,
+      title: settings["service" + index + "Title"],
+      description: settings["service" + index + "Description"],
+      tags: settings["service" + index + "Tags"],
+      icon: ["⌁", "</>", "▧"][index - 1], link: "#contact"}));
+  }
+  editService(id: string, field: string, value: string): void {
+    const cards = this.serviceCards(this.draft.settings);
+    const card = cards.find(card => card.id === id)!;
+    Object.assign(card, {[field]: value});
+    this.draft.settings["serviceCards"] = JSON.stringify(cards);
+  }
+  addService(): void {
+    const cards = this.serviceCards(this.draft.settings);
+    if (cards.length >= 12) return;
+    cards.push({id: "rubrique-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2), title: "Nouvelle rubrique", description: "Présentez votre prestation.", tags: "EXPERTISE", icon: "◇", link: "#contact"});
+    this.draft.settings["serviceCards"] = JSON.stringify(cards);
+  }
+  removeService(id: string): void {
+    if (confirm("Supprimer cette rubrique ? La suppression sera publiée après enregistrement."))
+      this.draft.settings["serviceCards"] = JSON.stringify(this.serviceCards(this.draft.settings).filter(card => card.id !== id));
+  }
+  validServiceLink(link: string): boolean {
+    return !link || /^(#[A-Za-z][\w-]*|\/(?!\/)[^\s\\<>]*|https?:\/\/[^\s\\<>]+|mailto:[^\s\\<>]+|tel:\+?[0-9 ()-]+)$/.test(link);
+  }
+  get invalidServiceLinks(): boolean { return this.serviceCards(this.draft.settings).some(card => !this.validServiceLink(card.link)); }
   groups = contentGroups;
   mediaSlots = mediaSlots;
   media: MediaAsset[] = [];
@@ -290,7 +319,7 @@ export class App implements OnInit {
       };
       this.draft = structuredClone(this.content);
       this.contentLoaded = true;
-      if (!this.admin) this.form.subject = this.t("service2Title");
+      if (!this.admin) this.form.subject = this.serviceCards()[0]?.title || this.t("formOtherSubject");
       this.updateMetadata();
     } catch {
       if (this.admin)
@@ -449,7 +478,7 @@ export class App implements OnInit {
         name: "",
         email: "",
         company: "",
-        subject: this.t("service2Title"),
+        subject: this.serviceCards()[0]?.title || this.t("formOtherSubject"),
         message: "",
         consent: false,
         website: "",
@@ -561,7 +590,7 @@ export class App implements OnInit {
     }
   }
   async save() {
-    if (!this.contentLoaded || this.saving || !this.hasUnsavedChanges) return;
+    if (!this.contentLoaded || this.saving || !this.hasUnsavedChanges || this.invalidServiceLinks) return;
     const submitted = structuredClone(this.draft);
     this.saving = true;
     this.notice = "";

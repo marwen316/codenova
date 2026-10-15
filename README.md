@@ -105,7 +105,7 @@ Le titre, l’introduction et la disponibilité existants sont préservés par l
 
 Les modifications sont visibles après rechargement du site public, sans redéploiement. L’e-mail, le téléphone et l’adresse actualisent aussi les liens correspondants. Le titre SEO, la description, le favicon et les données structurées sont actualisés dans le navigateur. Le HTML prérendu fourni avant l’exécution JavaScript reste un instantané de construction ; son actualisation pour les robots sans JavaScript nécessite une étape de publication adaptée (voir la section référencement ci-dessus).
 
-La rubrique « Images et logos » permet de téléverser, sélectionner et restaurer les images d’origine. Le changement du nombre de cartes/sections ne fait pas partie de cet éditeur ; les trois expertises et les trois étapes sont modifiables. Les identifiants administrateur, les paramètres de base de données et la rétention automatique des messages restent des paramètres serveur.
+La rubrique « Images et logos » permet de téléverser, sélectionner et restaurer les images d’origine. La rubrique « Rubriques des expertises » permet d’ajouter et supprimer jusqu’à 12 cartes, de modifier titre, contenu, mots-clés, symbole et lien (ancre, chemin interne, HTTP(S), mailto ou tel). Un lien vide masque la flèche. Les sujets du formulaire de contact suivent la liste publiée. Les trois cartes existantes sont conservées lors de la mise à jour ; les changements restent en brouillon jusqu’à l’enregistrement. Les trois étapes de l’approche restent fixes. Les identifiants administrateur, les paramètres de base de données et la rétention automatique des messages restent des paramètres serveur.
 
 Pour déployer une version modifiant l’API ou la base, reconstruire **les deux applications** :
 

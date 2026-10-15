@@ -855,3 +855,7 @@ contentGroups
     maxLength: 500,
     required: true,
   });
+
+contentDefaults["serviceCards"] = "";
+for (const group of contentGroups)
+  group.fields = group.fields.filter(field => !/^service[1-3](Title|Description|Tags)$/.test(field.key));

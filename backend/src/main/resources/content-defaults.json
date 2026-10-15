@@ -100,5 +100,6 @@
   "themeMuted": "#a0a8c3",
   "heroImage": "",
   "heroImageAlt": "Illustration de l’expertise informatique de CodeNova",
-  "socialImage": "/social-card.png"
+  "socialImage": "/social-card.png",
+  "serviceCards": ""
 }
