@@ -76,3 +76,22 @@ Prévoir sauvegardes PostgreSQL, supervision, mises à jour des dépendances et 
 - `backend/src/test` et `frontend/e2e` : tests d’intégration et navigateur.
 - `scripts` : installation reproductible, Maven et démarrage.
 - `compose.yaml` : PostgreSQL et déploiement des applications via le profil `app`.
+
+## Instance de recette isolée et tests de bout en bout
+
+```bash
+./scripts/test-deploy.sh
+```
+
+Cette commande compile les artefacts de production, démarre le projet Docker `codenova-test` (Nginx, JVM et une base PostgreSQL dédiée) et exécute les tests Playwright contre Nginx sur le port local 8088. Elle utilise les identifiants de `.env` sans les afficher. Le volume `codenova-test_test_data` est indépendant de la base de développement. PostgreSQL et l’API de recette ne sont pas publiés sur l’hôte. Les applications utilisent les artefacts compilés montés en lecture seule, sans reconstruction des Dockerfiles de production.
+
+`TEST_PORT` permet de choisir un autre port. `E2E_BASE_URL` permet de lancer Playwright contre une autre instance de recette ; les serveurs de développement ne sont pas démarrés lorsque cette variable est définie. Utiliser une instance réservée aux tests, car le parcours crée puis supprime son message.
+
+```bash
+# État, logs et arrêt de la recette (les données sont conservées).
+docker compose -p codenova-test -f compose.test.yaml ps
+docker compose -p codenova-test -f compose.test.yaml logs --tail=100
+docker compose -p codenova-test -f compose.test.yaml down
+```
+
+L’instance cloud ne fournit pas de lien public. Pour une recette sur VPS, il faut un accès SSH configuré et un reverse proxy HTTPS ou un tunnel SSH. Ne pas exposer directement l’administration en HTTP sur Internet. L’accès administrateur et la base de recette doivent utiliser des identifiants propres au serveur cible.

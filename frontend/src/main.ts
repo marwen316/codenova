@@ -5,13 +5,13 @@ interface Message { id:number; name:string; email:string; company:string; subjec
 @Component({selector:'app-root',standalone:true,imports:[FormsModule],templateUrl:'./app.html'})
 export class App implements OnInit {
  private cdr=inject(ChangeDetectorRef);
- menu=false; admin=typeof window!=='undefined' && window.location.pathname==='/admin'; legal=''; year=new Date().getFullYear();
+ ready=false; menu=false; admin=typeof window!=='undefined' && window.location.pathname==='/admin'; legal=''; year=new Date().getFullYear();
  content={headline:'Votre ambition. Notre code.',intro:'Nous transformons vos défis numériques en solutions utiles, solides et durables. Du premier conseil à la dernière ligne de code.',available:true};
  form={name:'',email:'',company:'',subject:'Développement web',message:'',consent:false,website:''};
  busy=false; notice=''; error=false; authenticated=false; username=''; password=''; messages:Message[]=[]; filter='all'; selected:Message|null=null; csrf='';
  get visible(){return this.messages.filter(m=>this.filter!=='unread'||!m.read)}
  get unread(){return this.messages.filter(m=>!m.read).length}
- async ngOnInit(){if(typeof window==='undefined')return;if(this.admin){const meta=document.createElement('meta');meta.name='robots';meta.content='noindex, nofollow';document.head.appendChild(meta);}try{const r=await fetch('/api/content');if(r.ok)this.content=await r.json();}catch{} if(this.admin){await this.token();await this.load(false);}this.cdr.markForCheck();}
+ async ngOnInit(){if(typeof window==='undefined')return;this.ready=true;if(this.admin){const meta=document.createElement('meta');meta.name='robots';meta.content='noindex, nofollow';document.head.appendChild(meta);}try{const r=await fetch('/api/content');if(r.ok)this.content=await r.json();}catch{} if(this.admin){await this.token();await this.load(false);}this.cdr.markForCheck();}
  async token(){try{const r=await fetch('/api/csrf');if(r.ok)this.csrf=(await r.json()).token;}catch{}}
  async send(){this.busy=true;this.notice='';try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.form)});if(!r.ok)throw Error();this.notice='Merci ! Votre message a bien été envoyé. Nous reviendrons vers vous prochainement.';this.error=false;this.form={name:'',email:'',company:'',subject:'Développement web',message:'',consent:false,website:''};}catch{this.error=true;this.notice='L’envoi est indisponible pour le moment. Veuillez réessayer dans quelques instants.';}finally{this.busy=false;this.cdr.markForCheck();}}
  async login(){this.busy=true;this.notice='';try{await this.token();const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-XSRF-TOKEN':this.csrf},body:new URLSearchParams({username:this.username,password:this.password})});if(!r.ok)throw Error();this.password='';await this.token();await this.load();}catch{this.notice='Connexion impossible. Vérifiez vos identifiants et la disponibilité du service.';}finally{this.busy=false;this.cdr.markForCheck();}}
