@@ -4,7 +4,7 @@ Site vitrine en français pour CodeNova, SASU de conseil en systèmes et logicie
 
 ## Fonctionnalités
 
-- Identité graphique ivoire / vert citron, logo SVG original, mise en page responsive, polices auto-hébergées.
+- Identité graphique futuriste bleu nuit, violet et cyan, logo SVG inspiré des chevrons de code, mise en page responsive et polices auto-hébergées. Animations lentes du noyau et des orbites, apparition de l’accueil et réactions au survol ; désactivation via `prefers-reduced-motion`.
 - Présentation, expertises, approche, adresse et itinéraire OpenStreetMap, téléphone et e-mail.
 - Formulaire avec validation côté navigateur et serveur, consentement obligatoire, champ anti-robot et limitation des envois.
 - Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, édition du titre de présentation, de l’introduction et de la disponibilité.
@@ -71,7 +71,7 @@ Prévoir sauvegardes PostgreSQL, supervision, mises à jour des dépendances et 
 ## Structure
 
 - `frontend/src` : composants et styles Angular.
-- `frontend/public/logo.svg` : logo vectoriel téléchargeable ; `social-card.png` : image sociale.
+- `frontend/public/logo.svg` : symbole vectoriel ; `logo-full.svg` : logo complet circulaire téléchargeable ; `social-card.png` : image sociale.
 - `backend/src/main` : API, sécurité, entités et migration initiale.
 - `backend/src/test` et `frontend/e2e` : tests d’intégration et navigateur.
 - `scripts` : installation reproductible, Maven et démarrage.
