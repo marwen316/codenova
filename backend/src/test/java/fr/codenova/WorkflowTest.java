@@ -39,4 +39,14 @@ private String payload(java.util.Map<String,String> settings)throws Exception{re
 @Test void anonymousCannotUpdateEditorialSettings()throws Exception{
  mvc.perform(put("/api/admin/content").with(csrf()).contentType("application/json").content(payload(java.util.Map.of("companyName","Forbidden")))).andExpect(status().isUnauthorized());
 }
+
+@Test void themeColorsPersistWithOtherEditorialSettings()throws Exception{
+ mvc.perform(put("/api/admin/content").with(user("admin").roles("ADMIN")).with(csrf()).contentType("application/json").content(payload(java.util.Map.of("themePrimary","#ff8800","themeBackground","#f1f5f9")))).andExpect(status().isOk());
+ mvc.perform(get("/api/content")).andExpect(jsonPath("$.settings.themePrimary").value("#ff8800")).andExpect(jsonPath("$.settings.themeBackground").value("#f1f5f9")).andExpect(jsonPath("$.settings.companyName").value("CodeNova"));
+}
+@Test void malformedThemeColorsAreRejected()throws Exception{
+ for(String value:java.util.List.of("red","#fff","#GG0000","#000000; color:red","url(https://example.com)")){
+  mvc.perform(put("/api/admin/content").with(user("admin").roles("ADMIN")).with(csrf()).contentType("application/json").content(payload(java.util.Map.of("themePrimary",value)))).andExpect(status().isBadRequest());
+ }
+}
 }

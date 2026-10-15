@@ -1,3 +1,4 @@
+import { themeFields, validColor, contrast, accentText } from "./theme";
 import { Component, ChangeDetectorRef, inject, OnInit } from "@angular/core";
 import { SiteContent, contentDefaults, contentGroups } from "./content-model";
 import { FormsModule } from "@angular/forms";
@@ -149,7 +150,63 @@ export class App implements OnInit {
       this.cdr.markForCheck();
     }
   }
+  previewColor(key: string): string {
+    const value = this.draft.settings[key];
+    return validColor(value) ? value : contentDefaults[key];
+  }
+  get previewButtonText(): string {
+    return accentText(this.previewColor("themePrimary"));
+  }
+  get lowThemeContrast(): boolean {
+    return ["themeBackground", "themeSurface"].some((background) =>
+      ["themeText", "themeMuted"].some(
+        (text) =>
+          contrast(this.previewColor(background), this.previewColor(text)) <
+          4.5,
+      ),
+    );
+  }
+  resetTheme(): void {
+    for (const field of themeFields)
+      this.draft.settings[field.key] = field.defaultValue;
+    this.notice =
+      "Couleurs par défaut rétablies dans le brouillon. Enregistrez pour les publier.";
+  }
+  applyTheme(): void {
+    // Keep administration legible even if the public palette has poor contrast.
+    if (this.admin) return;
+    document.body.classList.add("custom-theme");
+    document.body.style.colorScheme =
+      accentText(this.t("themeBackground")) === "#ffffff" ? "dark" : "light";
+    const names: Record<string, string> = {
+      themePrimary: "--theme-primary",
+      themeSecondary: "--theme-secondary",
+      themeBackground: "--paper",
+      themeSurface: "--theme-surface",
+      themeText: "--ink",
+      themeMuted: "--muted",
+    };
+    for (const field of themeFields) {
+      const value = this.t(field.key);
+      document.documentElement.style.setProperty(
+        names[field.key],
+        validColor(value) ? value : field.defaultValue,
+      );
+    }
+    document.documentElement.style.setProperty(
+      "--on-accent",
+      accentText(
+        validColor(this.t("themePrimary"))
+          ? this.t("themePrimary")
+          : contentDefaults["themePrimary"],
+      ),
+    );
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", this.t("themeBackground"));
+  }
   updateMetadata() {
+    this.applyTheme();
     document.title = this.t("seoTitle");
     for (const [selector, value] of [
       ['meta[name="description"]', this.t("seoDescription")],

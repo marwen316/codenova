@@ -505,6 +505,55 @@
                     </summary>
                     <fieldset>
                       <legend class="sr-only">{{ group.title }}</legend>
+                      @if (group.id === "appearance") {
+                        <div
+                          class="theme-preview"
+                          role="region"
+                          aria-label="Aperçu des couleurs"
+                          [style.background]="previewColor('themeBackground')"
+                          [style.color]="previewColor('themeText')"
+                        >
+                          <span [style.color]="previewColor('themeSecondary')"
+                            >APERÇU EN DIRECT</span
+                          >
+                          <h3>Votre univers, vos couleurs.</h3>
+                          <p [style.color]="previewColor('themeMuted')">
+                            Vérifiez la lisibilité de votre palette avant de
+                            l’enregistrer.
+                          </p>
+                          <div
+                            class="theme-preview-card"
+                            [style.background]="previewColor('themeSurface')"
+                          >
+                            <strong>Une carte de votre site</strong>
+                            <p [style.color]="previewColor('themeMuted')">
+                              Les changements restent privés jusqu’à
+                              l’enregistrement.
+                            </p>
+                            <span
+                              class="theme-preview-button"
+                              [style.background]="previewColor('themePrimary')"
+                              [style.color]="previewButtonText"
+                              >Votre bouton →</span
+                            >
+                          </div>
+                        </div>
+                        @if (lowThemeContrast) {
+                          <p class="contrast-note">
+                            Le contraste de certains textes est faible. Ajustez
+                            les couleurs du texte ou des fonds pour améliorer la
+                            lisibilité.
+                          </p>
+                        }
+                        <button
+                          class="button"
+                          type="button"
+                          (click)="resetTheme()"
+                        >
+                          Rétablir les couleurs par défaut
+                        </button>
+                      }
+
                       @for (field of group.fields; track field.key) {
                         <label
                           >{{ field.label }}
@@ -513,7 +562,28 @@
                               >*</span
                             >
                           }
-                          @if (field.type === "textarea") {
+                          @if (field.type === "color") {
+                            <div class="color-control">
+                              <input
+                                type="color"
+                                [name]="field.key"
+                                [(ngModel)]="draft.settings[field.key]"
+                                [attr.aria-label]="field.label + ' — sélecteur'"
+                              />
+                              <input
+                                type="text"
+                                [name]="field.key + 'Hex'"
+                                [(ngModel)]="draft.settings[field.key]"
+                                required
+                                pattern="#[0-9a-fA-F]{6}"
+                                maxlength="7"
+                                spellcheck="false"
+                                [attr.aria-label]="
+                                  field.label + ' — code hexadécimal'
+                                "
+                              />
+                            </div>
+                          } @else if (field.type === "textarea") {
                             <textarea
                               [name]="field.key"
                               [(ngModel)]="draft.settings[field.key]"
@@ -569,8 +639,7 @@
                 </div>
                 @if (editorForm.invalid) {
                   <p class="editor-help">
-                    Complétez les champs obligatoires et vérifiez le format de
-                    l’e-mail avant d’enregistrer.
+                    Vérifiez les champs obligatoires, l’e-mail et les couleurs au format #RRGGBB.
                   </p>
                 }
               </form>

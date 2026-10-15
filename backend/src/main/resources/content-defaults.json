@@ -91,5 +91,11 @@
   "logoIcon": "/logo.svg",
   "logoFull": "/logo-full.svg",
   "seoTitle": "CodeNova — Conseil & ingénierie logicielle à Sartrouville",
-  "seoDescription": "CodeNova accompagne votre transformation numérique : conseil en systèmes informatiques, développement web et architecture logicielle à Sartrouville, en Île-de-France."
+  "seoDescription": "CodeNova accompagne votre transformation numérique : conseil en systèmes informatiques, développement web et architecture logicielle à Sartrouville, en Île-de-France.",
+  "themePrimary": "#a879ff",
+  "themeSecondary": "#50daef",
+  "themeBackground": "#080b16",
+  "themeSurface": "#11182a",
+  "themeText": "#eef0ff",
+  "themeMuted": "#a0a8c3"
 }

@@ -7,7 +7,7 @@ Site vitrine en français pour CodeNova, SASU de conseil en systèmes et logicie
 - Identité graphique futuriste bleu nuit, violet et cyan, logo SVG inspiré des chevrons de code, mise en page responsive et polices auto-hébergées. Animations lentes du noyau et des orbites, apparition de l’accueil et réactions au survol ; désactivation via `prefers-reduced-motion`.
 - Présentation, expertises, approche, adresse et itinéraire OpenStreetMap, téléphone et e-mail.
 - Formulaire avec validation côté navigateur et serveur, consentement obligatoire, champ anti-robot et limitation des envois.
-- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, onglet « Contenu du site » séparé des messages, avec recherche et édition de 93 champs publics, du titre de présentation, de l’introduction et de la disponibilité.
+- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, onglet « Contenu du site » séparé des messages, avec recherche et édition de 99 champs publics, du titre de présentation, de l’introduction et de la disponibilité.
 - Mot de passe BCrypt, protection CSRF des opérations authentifiées, cookie de session HttpOnly / SameSite Strict, aucune inscription publique.
 - PostgreSQL et migrations Flyway. Purge quotidienne des messages de plus de 365 jours.
 - Accueil prérendu, HTML sémantique, métadonnées et données structurées ProfessionalService, robots.txt, image de partage et génération du sitemap une fois le domaine choisi.
@@ -115,3 +115,10 @@ docker compose -p codenova-recette -f compose.yaml -f compose.recette.yaml --pro
 ```
 
 La migration est appliquée au démarrage du backend ; ne pas supprimer le volume PostgreSQL.
+
+
+## Couleurs du site
+
+Dans **Contenu du site → Apparence — couleurs**, six couleurs sont configurables par sélecteur ou code hexadécimal `#RRGGBB` : principale, secondaire, fond de page, fond des cartes/formulaires, texte principal et texte secondaire. L’aperçu est privé tant que les modifications ne sont pas enregistrées. Un indicateur signale les contrastes faibles ; le texte des boutons principaux choisit automatiquement le noir ou le blanc selon la couleur du bouton.
+
+« Rétablir les couleurs par défaut » modifie le brouillon : enregistrer ensuite pour publier la palette initiale. L’administration conserve sa propre palette pour rester utilisable. Les couleurs sont stockées avec le contenu existant dans PostgreSQL ; aucune nouvelle migration n’est nécessaire. Les anciens enregistrements utilisent automatiquement la palette initiale. Les fichiers graphiques des logos conservent leurs couleurs propres.

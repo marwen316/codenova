@@ -1,3 +1,4 @@
+import { themeFields } from "./theme";
 export interface SiteContent {
   headline: string;
   intro: string;
@@ -12,6 +13,9 @@ export interface ContentField {
   required: boolean;
 }
 export const contentDefaults: Record<string, string> = {
+  ...Object.fromEntries(
+    themeFields.map((field) => [field.key, field.defaultValue]),
+  ),
   companyName: "CodeNova",
   legalForm: "SASU",
   publisher: "Marwen SHILI",
@@ -821,3 +825,15 @@ export const contentGroups: {
     ],
   },
 ];
+
+contentGroups.push({
+  id: "appearance",
+  title: "Apparence — couleurs",
+  fields: themeFields.map((field) => ({
+    key: field.key,
+    label: field.label,
+    type: "color",
+    maxLength: 7,
+    required: true,
+  })),
+});
