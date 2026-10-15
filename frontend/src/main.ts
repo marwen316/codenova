@@ -60,6 +60,8 @@ export class App implements OnInit {
   filter = "all";
   selected: Message | null = null;
   csrf = "";
+  csrfStatus: number | null = null;
+  messagesStatus: number | null = null;
   closeMenu(): void {
     this.menu = false;
   }
@@ -241,11 +243,39 @@ export class App implements OnInit {
         },
       });
   }
-  async token() {
+  authError(status: number | null): string {
+    if (status === 401)
+      return "Identifiant ou mot de passe incorrect (HTTP 401). Utilisez les identifiants administrateur configurés sur ce serveur.";
+    if (status === 403)
+      return "Le jeton de sécurité a été refusé (HTTP 403). Rechargez la page ou essayez une fenêtre privée, puis reconnectez-vous.";
+    if (status === 429)
+      return "Trop de tentatives de connexion (HTTP 429). Patientez une minute avant de réessayer.";
+    if (status === 502 || status === 503 || status === 504)
+      return (
+        "Le service d’authentification est temporairement indisponible (HTTP " +
+        status +
+        "). Vérifiez le démarrage du backend sur le serveur."
+      );
+    if (status !== null)
+      return (
+        "Le serveur ne peut pas traiter la connexion (HTTP " + status + ")."
+      );
+    return "Connexion au serveur impossible. Vérifiez votre connexion et la disponibilité du site.";
+  }
+  async token(): Promise<boolean> {
+    this.csrf = "";
+    this.csrfStatus = null;
     try {
-      const r = await fetch("/api/csrf");
-      if (r.ok) this.csrf = (await r.json()).token;
-    } catch {}
+      const r = await fetch("/api/csrf", { cache: "no-store" });
+      this.csrfStatus = r.status;
+      if (!r.ok) return false;
+      const data = await r.json();
+      if (typeof data.token !== "string" || !data.token) return false;
+      this.csrf = data.token;
+      return true;
+    } catch {
+      return false;
+    }
   }
   async send() {
     this.busy = true;
@@ -282,7 +312,11 @@ export class App implements OnInit {
     this.busy = true;
     this.notice = "";
     try {
-      await this.token();
+      if (!(await this.token()))
+        throw Error(
+          "Impossible d’initialiser la connexion. " +
+            this.authError(this.csrfStatus),
+        );
       const r = await fetch("/api/login", {
         method: "POST",
         headers: {
@@ -294,27 +328,46 @@ export class App implements OnInit {
           password: this.password,
         }),
       });
-      if (!r.ok) throw Error();
+      if (!r.ok) throw Error(this.authError(r.status));
       this.password = "";
-      await this.token();
-      await this.load();
-    } catch {
+      if (!(await this.token()))
+        throw Error(
+          "Identifiants acceptés, mais la session ne peut pas être initialisée. " +
+            this.authError(this.csrfStatus),
+        );
+      if (!(await this.load(false)))
+        throw Error(
+          this.messagesStatus === 401
+            ? "Identifiants acceptés, mais la session n’est pas conservée (HTTP 401). Vérifiez les cookies du navigateur et la configuration HTTP/HTTPS du serveur."
+            : this.authError(this.messagesStatus),
+        );
+    } catch (error) {
       this.notice =
-        "Connexion impossible. Vérifiez vos identifiants et la disponibilité du service.";
+        error instanceof Error && error.message !== "Failed to fetch"
+          ? error.message
+          : this.authError(null);
     } finally {
       this.busy = false;
       this.cdr.markForCheck();
     }
   }
-  async load(report = true) {
+  async load(report = true): Promise<boolean> {
+    this.messagesStatus = null;
     try {
-      const r = await fetch("/api/admin/messages");
+      const r = await fetch("/api/admin/messages", { cache: "no-store" });
+      this.messagesStatus = r.status;
       if (!r.ok) throw Error();
       this.messages = await r.json();
       this.authenticated = true;
+      return true;
     } catch {
       this.authenticated = false;
-      if (report) this.notice = "Session expirée ou service indisponible.";
+      if (report)
+        this.notice =
+          this.messagesStatus === 401
+            ? "Votre session a expiré. Reconnectez-vous."
+            : this.authError(this.messagesStatus);
+      return false;
     } finally {
       this.cdr.markForCheck();
     }

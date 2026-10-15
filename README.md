@@ -127,3 +127,11 @@ Dans **Contenu du site → Apparence — couleurs**, six couleurs sont configura
 ### Confirmation d’enregistrement
 
 Les actions de l’éditeur restent visibles en bas de l’écran. Le bandeau distingue les modifications en attente, l’enregistrement en cours et le résultat. Une sauvegarde n’est confirmée qu’après relecture sans cache de l’API publique et comparaison de tous les champs soumis (textes et couleurs compris). Les erreurs HTTP, notamment une session expirée ou un refus de validation, sont affichées à côté du bouton ; le brouillon est conservé dans le formulaire. Le bouton est désactivé lorsqu’aucune modification n’est en attente. Un visiteur déjà sur le site doit recharger sa page pour recevoir les changements.
+
+### Diagnostic de connexion sur le VPS
+
+Exécuter `./scripts/diagnose-auth.sh` (ou passer un autre nom de projet Compose en premier argument). Cette commande est en lecture seule : état des conteneurs, codes HTTP des API publiques, présence des deux variables d’authentification et état non secret du cookie sécurisé. Elle n’affiche aucun identifiant, mot de passe, jeton ou cookie.
+
+Le formulaire distingue les identifiants refusés (401), le jeton de sécurité refusé (403), la limitation des tentatives (429), le backend indisponible (502/503/504) et une session qui n’est pas conservée après acceptation des identifiants. Une recréation du backend invalide les sessions existantes ; les identifiants proviennent du `.env` de ce serveur. `COOKIE_SECURE=true` exige un accès HTTPS et empêche la conservation de la session sur une adresse HTTP.
+
+Le proxy Nginx utilise le résolveur DNS interne Docker et renouvelle l’adresse du backend toutes les cinq secondes. Cela évite de conserver l’ancienne IP après une recréation du backend. Vérification de diagnostic : si les API via Nginx renvoient 502 mais que le contrôle direct `web -> backend` réussit, le proxy doit être rechargé ou reconstruit avec la configuration actuelle. Si le contrôle direct échoue aussi, vérifier l’état et les logs du backend.
