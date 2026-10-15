@@ -7,7 +7,7 @@ Site vitrine en français pour CodeNova, SASU de conseil en systèmes et logicie
 - Identité graphique futuriste bleu nuit, violet et cyan, logo SVG inspiré des chevrons de code, mise en page responsive et polices auto-hébergées. Animations lentes du noyau et des orbites, apparition de l’accueil et réactions au survol ; désactivation via `prefers-reduced-motion`.
 - Présentation, expertises, approche, adresse et itinéraire OpenStreetMap, téléphone et e-mail.
 - Formulaire avec validation côté navigateur et serveur, consentement obligatoire, champ anti-robot et limitation des envois.
-- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, édition du titre de présentation, de l’introduction et de la disponibilité.
+- Administration `/admin` : authentification par session, boîte de réception, statut lu/non lu, filtre, suppression, onglet « Contenu du site » séparé des messages, avec recherche et édition de 93 champs publics, du titre de présentation, de l’introduction et de la disponibilité.
 - Mot de passe BCrypt, protection CSRF des opérations authentifiées, cookie de session HttpOnly / SameSite Strict, aucune inscription publique.
 - PostgreSQL et migrations Flyway. Purge quotidienne des messages de plus de 365 jours.
 - Accueil prérendu, HTML sémantique, métadonnées et données structurées ProfessionalService, robots.txt, image de partage et génération du sitemap une fois le domaine choisi.
@@ -64,7 +64,7 @@ SITE_URL=https://votre-domaine.fr npm run seo
 
 Cette dernière commande ajoute l’URL canonique, l’URL de partage, l’image sociale, le sitemap et sa déclaration dans robots.txt aux fichiers compilés. Elle n’invente pas de domaine. Avec Docker, passer `--build-arg SITE_URL=https://votre-domaine.fr` au build frontend (ou définir l’argument dans Compose). Déployer les fichiers compilés après génération. Soumettre le sitemap à Search Console après publication. Un changement du contenu via l’administration apparaît immédiatement dans le navigateur ; relancer le build pour actualiser aussi le HTML prérendu lu par les robots. Le prérendu reprend les valeurs initiales du code : synchroniser le texte éditorial avant un build SEO destiné à la production.
 
-Avant publication, compléter les mentions légales : SIREN/RCS, capital social, hébergeur et ses coordonnées. Informations fournies : SASU, responsable de publication Marwen SHILI, adresse 13 B rue de la Féculerie, 78500 Sartrouville, téléphone +33 7 58 62 86 89, e-mail temporaire marwen.shili.codenova@gmail.com. Remplacer cet e-mail dans le template et les données structurées lorsque l’adresse définitive est disponible. Faire valider les mentions légales et la politique de confidentialité pour l’activité réelle.
+Avant publication, compléter les mentions légales : SIREN/RCS, capital social, hébergeur et ses coordonnées. Informations fournies : SASU, responsable de publication Marwen SHILI, adresse 13 B rue de la Féculerie, 78500 Sartrouville, téléphone +33 7 58 62 86 89, e-mail temporaire marwen.shili.codenova@gmail.com. Remplacer cet e-mail dans l’onglet « Contenu du site » lorsque l’adresse définitive est disponible ; les liens de contact et les données structurées du navigateur sont actualisés. Faire valider les mentions légales et la politique de confidentialité pour l’activité réelle.
 
 Prévoir sauvegardes PostgreSQL, supervision, mises à jour des dépendances et politique de restauration avant production. Le formulaire stocke les messages dans l’administration ; aucune notification e-mail automatique n’est configurée.
 
@@ -95,3 +95,23 @@ docker compose -p codenova-test -f compose.test.yaml down
 ```
 
 L’instance cloud ne fournit pas de lien public. Pour une recette sur VPS, il faut un accès SSH configuré et un reverse proxy HTTPS ou un tunnel SSH. Ne pas exposer directement l’administration en HTTP sur Internet. L’accès administrateur et la base de recette doivent utiliser des identifiants propres au serveur cible.
+
+
+## Gestion du contenu
+
+L’administration comprend deux onglets : **Messages** et **Contenu du site**. Le second organise les informations en rubriques repliables : entreprise et coordonnées, accueil et navigation, expertises, approche et présentation, contact et formulaire, pied de page et mentions légales, logos et référencement. Une recherche filtre les champs. Les changements sont publiés ensemble par « Enregistrer les modifications » ; « Annuler les modifications » rétablit le dernier enregistrement. Passer d’un onglet à l’autre conserve le brouillon, mais recharger la page abandonne les modifications non enregistrées.
+
+Le titre, l’introduction et la disponibilité existants sont préservés par la migration Flyway V2. Les nouveaux champs sont stockés en JSONB dans PostgreSQL, avec des valeurs initiales si aucun remplacement n’est enregistré. Les anciens appels API à trois champs restent compatibles. Les écritures exigent une session administrateur, un jeton CSRF et des champs valides. Les contenus sont rendus comme texte, sans HTML arbitraire.
+
+Les modifications sont visibles après rechargement du site public, sans redéploiement. L’e-mail, le téléphone et l’adresse actualisent aussi les liens correspondants. Le titre SEO, la description, le favicon et les données structurées sont actualisés dans le navigateur. Le HTML prérendu fourni avant l’exécution JavaScript reste un instantané de construction ; son actualisation pour les robots sans JavaScript nécessite une étape de publication adaptée (voir la section référencement ci-dessus).
+
+Les logos se configurent par un chemin de fichier déjà hébergé sur le site (`/logo.svg`, `/logo-full.svg`). Le téléversement de fichiers et le changement du nombre de cartes/sections ne font pas partie de cet éditeur ; les trois expertises et les trois étapes sont modifiables. Les identifiants administrateur, les paramètres de base de données et la rétention automatique des messages restent des paramètres serveur.
+
+Pour déployer une version modifiant l’API ou la base, reconstruire **les deux applications** :
+
+```bash
+git pull --ff-only origin main
+docker compose -p codenova-recette -f compose.yaml -f compose.recette.yaml --profile app up -d --build backend web
+```
+
+La migration est appliquée au démarrage du backend ; ne pas supprimer le volume PostgreSQL.
