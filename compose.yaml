@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: codenova
+      POSTGRES_USER: codenova
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codenova -d codenova"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    profiles: [app]
+    build: ./backend
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/codenova
+      DATABASE_USER: codenova
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Set ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    profiles: [app]
+    build: ./frontend
+    ports:
+      - "127.0.0.1:8088:80"
+    depends_on: [backend]
+volumes:
+  postgres_data:

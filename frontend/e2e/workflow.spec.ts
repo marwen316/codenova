@@ -1,0 +1,24 @@
+import {test,expect} from '@playwright/test';
+test('real contact and administrator workflow',async({page})=>{
+ const marker='E2E '+Date.now();
+ await page.goto('/');
+ await page.getByLabel('Votre nom *',{exact:true}).fill(marker);
+ await page.getByLabel('Votre adresse e-mail *').fill('integration@example.com');
+ await page.getByLabel('Quelques mots sur votre projet *').fill('Projet de validation du parcours complet.');
+ await page.getByRole('checkbox').check();
+ await page.getByRole('button',{name:'Envoyer mon message'}).click();
+ await expect(page.getByRole('status')).toContainText('Votre message a bien été envoyé');
+ await page.goto('/admin');
+ await page.getByLabel('Identifiant').fill(process.env['ADMIN_USERNAME']!);
+ await page.getByLabel('Mot de passe').fill(process.env['ADMIN_PASSWORD']!);
+ await page.getByRole('button',{name:'Se connecter'}).click();
+ await expect(page.getByRole('heading',{name:'Votre espace CodeNova.'})).toBeVisible();
+ await page.getByRole('button').filter({hasText:marker}).click();
+ await expect(page.locator('.message-body')).toContainText('Projet de validation du parcours complet.');
+ await expect(page.locator('.message-item').filter({hasText:marker})).not.toHaveClass(/unread/);
+ page.once('dialog',dialog=>dialog.accept());
+ await page.getByRole('button',{name:'Supprimer le message'}).click();
+ await expect(page.locator('.message-item').filter({hasText:marker})).toHaveCount(0);
+ await page.getByRole('button',{name:'Se déconnecter'}).click();
+ await expect(page.getByLabel('Mot de passe')).toBeVisible();
+});

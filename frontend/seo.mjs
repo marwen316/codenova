@@ -1,0 +1,12 @@
+import {readFile,writeFile} from 'node:fs/promises';
+const u=new URL(process.env.SITE_URL || '');
+if(u.protocol!=='https:' || u.pathname!=='/' || u.search || u.hash || u.username || u.password)throw Error('SITE_URL doit être une origine HTTPS, par exemple https://votre-domaine.fr');
+const url=u.origin+'/';
+const root='dist/web/browser/';
+const escape=s=>s.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
+const p=root+'index.html';let html=await readFile(p,'utf8');
+html=html.replace('</head>',`<link rel="canonical" href="${escape(url)}"><meta property="og:url" content="${escape(url)}"><meta property="og:image" content="${escape(url)}social-card.png"><meta property="og:locale" content="fr_FR"><meta name="twitter:card" content="summary_large_image"></head>`);
+await writeFile(p,html);
+await writeFile(root+'sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escape(url)}</loc></url></urlset>`);
+await writeFile(root+'robots.txt',`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${url}sitemap.xml\n`);
+console.log('Canonical, sitemap et métadonnées sociales générés.');
