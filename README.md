@@ -122,3 +122,8 @@ La migration est appliquée au démarrage du backend ; ne pas supprimer le volum
 Dans **Contenu du site → Apparence — couleurs**, six couleurs sont configurables par sélecteur ou code hexadécimal `#RRGGBB` : principale, secondaire, fond de page, fond des cartes/formulaires, texte principal et texte secondaire. L’aperçu est privé tant que les modifications ne sont pas enregistrées. Un indicateur signale les contrastes faibles ; le texte des boutons principaux choisit automatiquement le noir ou le blanc selon la couleur du bouton.
 
 « Rétablir les couleurs par défaut » modifie le brouillon : enregistrer ensuite pour publier la palette initiale. L’administration conserve sa propre palette pour rester utilisable. Les couleurs sont stockées avec le contenu existant dans PostgreSQL ; aucune nouvelle migration n’est nécessaire. Les anciens enregistrements utilisent automatiquement la palette initiale. Les fichiers graphiques des logos conservent leurs couleurs propres.
+
+
+### Confirmation d’enregistrement
+
+Les actions de l’éditeur restent visibles en bas de l’écran. Le bandeau distingue les modifications en attente, l’enregistrement en cours et le résultat. Une sauvegarde n’est confirmée qu’après relecture sans cache de l’API publique et comparaison de tous les champs soumis (textes et couleurs compris). Les erreurs HTTP, notamment une session expirée ou un refus de validation, sont affichées à côté du bouton ; le brouillon est conservé dans le formulaire. Le bouton est désactivé lorsqu’aucune modification n’est en attente. Un visiteur déjà sur le site doit recharger sa page pour recevoir les changements.

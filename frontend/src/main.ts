@@ -38,6 +38,8 @@ export class App implements OnInit {
   groups = contentGroups;
   contentSearch = "";
   saving = false;
+  saveFeedback = "";
+  saveError = false;
   contentLoaded = false;
   form = {
     name: "",
@@ -121,15 +123,19 @@ export class App implements OnInit {
     this.adminTab = tab;
     if (focus) document.getElementById("tab-" + tab)?.focus();
   }
+  get hasUnsavedChanges(): boolean {
+    return JSON.stringify(this.draft) !== JSON.stringify(this.content);
+  }
   resetDraft(): void {
     if (confirm("Annuler les modifications non enregistrées ?")) {
       this.draft = structuredClone(this.content);
-      this.notice = "Modifications annulées.";
+      this.saveFeedback = "Modifications annulées.";
+      this.saveError = false;
     }
   }
   async reloadContent() {
     try {
-      const r = await fetch("/api/content");
+      const r = await fetch("/api/content", { cache: "no-store" });
       if (!r.ok) throw Error();
       const data = await r.json();
       this.content = {
@@ -169,8 +175,9 @@ export class App implements OnInit {
   resetTheme(): void {
     for (const field of themeFields)
       this.draft.settings[field.key] = field.defaultValue;
-    this.notice =
+    this.saveFeedback =
       "Couleurs par défaut rétablies dans le brouillon. Enregistrez pour les publier.";
+    this.saveError = false;
   }
   applyTheme(): void {
     // Keep administration legible even if the public palette has poor contrast.
@@ -346,32 +353,80 @@ export class App implements OnInit {
     }
   }
   async save() {
-    if (!this.contentLoaded || this.saving) return;
+    if (!this.contentLoaded || this.saving || !this.hasUnsavedChanges) return;
+    const submitted = structuredClone(this.draft);
     this.saving = true;
     this.notice = "";
+    this.saveFeedback = "";
+    this.saveError = false;
     try {
-      const r = await fetch("/api/admin/content", {
+      const response = await fetch("/api/admin/content", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "X-XSRF-TOKEN": this.csrf,
         },
-        body: JSON.stringify(this.draft),
+        body: JSON.stringify(submitted),
       });
-      if (!r.ok) throw Error();
-      const data = await r.json();
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403)
+          throw Error(
+            "Votre session a expiré ou n’autorise plus l’enregistrement (HTTP " +
+              response.status +
+              "). Reconnectez-vous avant de réessayer.",
+          );
+        if (response.status === 400)
+          throw Error(
+            "Le serveur a refusé les données (HTTP 400). Vérifiez les champs. Si le problème persiste, vérifiez que le backend et le frontend sont tous deux à jour.",
+          );
+        if (response.status === 413)
+          throw Error(
+            "Le contenu dépasse la taille autorisée par le serveur (HTTP 413).",
+          );
+        throw Error(
+          "Enregistrement refusé par le serveur (HTTP " +
+            response.status +
+            ").",
+        );
+      }
+      // Read back after the write has committed: the PUT response alone does not prove persistence.
+      const verification = await fetch("/api/content", { cache: "no-store" });
+      if (!verification.ok)
+        throw Error(
+          "La demande a été envoyée, mais la vérification de l’enregistrement est indisponible (HTTP " +
+            verification.status +
+            ").",
+        );
+      const data = await verification.json();
+      const matches =
+        data.headline === submitted.headline &&
+        data.intro === submitted.intro &&
+        data.available === submitted.available &&
+        Object.entries(submitted.settings).every(
+          ([key, value]) => data.settings?.[key] === value,
+        );
+      if (!matches)
+        throw Error(
+          "Le serveur n’a pas confirmé les modifications : les valeurs relues diffèrent de votre saisie.",
+        );
       this.content = {
         headline: data.headline,
         intro: data.intro,
         available: data.available,
         settings: { ...contentDefaults, ...data.settings },
       };
-      this.draft = structuredClone(this.content);
+      if (JSON.stringify(this.draft) === JSON.stringify(submitted))
+        this.draft = structuredClone(this.content);
       this.updateMetadata();
-      this.notice = "Le contenu du site a été enregistré.";
-    } catch {
-      this.notice =
-        "Impossible d’enregistrer. Vérifiez les champs et votre connexion ; vos modifications sont conservées.";
+      this.saveFeedback =
+        "Le contenu du site a été enregistré et vérifié. Rechargez le site public pour voir les changements.";
+    } catch (error) {
+      this.saveError = true;
+      this.saveFeedback =
+        (error instanceof Error && error.message !== "Failed to fetch"
+          ? error.message
+          : "Connexion au serveur impossible. Vérifiez votre connexion et réessayez.") +
+        " Vos modifications restent dans le formulaire ; ne rechargez pas cette page avant de les avoir conservées.";
     } finally {
       this.saving = false;
       this.cdr.markForCheck();

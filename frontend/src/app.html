@@ -618,10 +618,29 @@
                   <p>Aucun champ ne correspond à votre recherche.</p>
                 }
                 <div class="editor-actions">
+                  @if (saveFeedback) {
+                    <p
+                      class="save-feedback"
+                      [class.save-failed]="saveError"
+                      [attr.role]="saveError ? 'alert' : 'status'"
+                    >
+                      {{ saveFeedback }}
+                    </p>
+                  }
+                  <span class="save-state">{{
+                    saving
+                      ? "Vérification de l’enregistrement…"
+                      : hasUnsavedChanges
+                        ? "Modifications non enregistrées"
+                        : "Aucune modification en attente"
+                  }}</span>
+
                   <button
                     type="submit"
                     class="button lime"
-                    [disabled]="editorForm.invalid || saving"
+                    [disabled]="
+                      editorForm.invalid || saving || !hasUnsavedChanges
+                    "
                   >
                     {{
                       saving
@@ -639,7 +658,8 @@
                 </div>
                 @if (editorForm.invalid) {
                   <p class="editor-help">
-                    Vérifiez les champs obligatoires, l’e-mail et les couleurs au format #RRGGBB.
+                    Vérifiez les champs obligatoires, l’e-mail et les couleurs
+                    au format #RRGGBB.
                   </p>
                 }
               </form>
