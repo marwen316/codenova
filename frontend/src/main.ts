@@ -9,6 +9,7 @@ export class App implements OnInit {
  content={headline:'Votre ambition. Notre code.',intro:'Nous transformons vos défis numériques en solutions utiles, solides et durables. Du premier conseil à la dernière ligne de code.',available:true};
  form={name:'',email:'',company:'',subject:'Développement web',message:'',consent:false,website:''};
  busy=false; notice=''; error=false; authenticated=false; username=''; password=''; messages:Message[]=[]; filter='all'; selected:Message|null=null; csrf='';
+ closeMenu(): void { this.menu=false; }
  get visible(){return this.messages.filter(m=>this.filter!=='unread'||!m.read)}
  get unread(){return this.messages.filter(m=>!m.read).length}
  async ngOnInit(){if(typeof window==='undefined')return;this.ready=true;if(this.admin){const meta=document.createElement('meta');meta.name='robots';meta.content='noindex, nofollow';document.head.appendChild(meta);}try{const r=await fetch('/api/content');if(r.ok)this.content=await r.json();}catch{} if(this.admin){await this.token();await this.load(false);}this.cdr.markForCheck();}
