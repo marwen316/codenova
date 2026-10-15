@@ -19,7 +19,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: "DM Sans Variable", sans-serif;
-  font-size: 15px;
+  font-size: 17px;
 }
 a {
   color: inherit;
@@ -75,7 +75,7 @@ header {
   letter-spacing: -1.2px;
 }
 .brand-dot {
-  font-size: 11px;
+  font-size: 14px;
   align-self: flex-start;
   margin-top: 4px;
   margin-left: -5px;
@@ -83,14 +83,14 @@ header {
 nav {
   display: flex;
   gap: 32px;
-  font-size: 13px;
+  font-size: 16px;
 }
 nav a:hover,
 .text-link:hover {
   color: #5d792f;
 }
 .nav-contact {
-  font-size: 13px;
+  font-size: 16px;
   border: 1px solid var(--ink);
   border-radius: 5px;
   padding: 12px 17px;
@@ -110,7 +110,7 @@ nav a:hover,
   align-items: center;
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 1.8px;
   font-weight: 650;
   display: flex;
@@ -156,7 +156,7 @@ em {
   transform: rotate(10deg);
 }
 .hero-copy > p {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.8;
   color: var(--muted);
   max-width: 420px;
@@ -176,7 +176,7 @@ em {
   border-radius: 5px;
   border: 1px solid var(--line);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 15px;
   background: transparent;
 }
 .lime {
@@ -187,7 +187,7 @@ em {
   background: #b4e45f;
 }
 .text-link {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
   border: 0;
   background: none;
@@ -198,7 +198,7 @@ em {
   align-items: center;
   gap: 10px;
   margin-top: 37px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .tiny-symbol {
@@ -231,7 +231,7 @@ em {
   right: 25px;
   display: flex;
   justify-content: space-between;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 1.2px;
   z-index: 3;
 }
@@ -305,7 +305,7 @@ em {
   box-shadow: 0 5px 25px #2337220d;
   border: 1px solid #ffffff;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 13px;
 }
 .tag-one {
   left: 22px;
@@ -332,7 +332,7 @@ em {
   margin: auto;
 }
 .expertise-band > span {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.2px;
   color: var(--muted);
 }
@@ -341,7 +341,7 @@ em {
   align-items: center;
   gap: 28px;
   font-family: "Manrope Variable", sans-serif;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 .expertise-band b {
@@ -368,7 +368,7 @@ h2 {
 }
 .section-heading > p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.8;
 }
 .cards {
@@ -395,7 +395,7 @@ h2 {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 35px;
-  font-size: 10px;
+  font-size: 13px;
   color: #7d8975;
 }
 .service-icon {
@@ -409,7 +409,7 @@ h2 {
   letter-spacing: -0.5px;
 }
 .service p {
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.9;
   color: var(--muted);
   margin: 17px 0 30px;
@@ -419,7 +419,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   gap: 5px;
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 0.7px;
   border-top: 1px solid #d5decc;
   padding-top: 18px;
@@ -439,7 +439,7 @@ h2 {
 }
 .approach-intro > p {
   max-width: 370px;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.9;
   color: var(--muted);
   margin: 23px 0;
@@ -454,15 +454,15 @@ h2 {
   border: 0;
 }
 .steps article > span {
-  font-size: 11px;
+  font-size: 14px;
   color: #768b61;
   padding-top: 4px;
 }
 .steps h3 {
-  font-size: 16px;
+  font-size: 18px;
 }
 .steps p {
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1.9;
   color: var(--muted);
   margin: 10px 0 0;
@@ -493,13 +493,13 @@ h2 {
   position: absolute;
   bottom: 20px;
   left: 23px;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.5px;
   line-height: 1.7;
   color: #dce8d5;
 }
 .about p {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.9;
 }
@@ -513,7 +513,7 @@ h2 {
   border: 1px solid var(--line);
   padding: 9px 12px;
   border-radius: 30px;
-  font-size: 10px;
+  font-size: 13px;
 }
 .contact {
   border-top: 1px solid var(--line);
@@ -525,7 +525,7 @@ h2 {
   font-size: 49px;
 }
 .contact-info > p {
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.9;
   color: var(--muted);
   margin: 23px 0;
@@ -534,7 +534,7 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: center;
-  font-size: 11px;
+  font-size: 14px;
   margin: 30px 0;
 }
 .address {
@@ -543,24 +543,24 @@ h2 {
   margin-top: 40px;
 }
 .address > span {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.5px;
 }
 .address address {
   font-style: normal;
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.7;
   margin: 16px 0;
 }
 .address a {
-  font-size: 11px;
+  font-size: 14px;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 .address small {
   display: block;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
   margin-top: 20px;
 }
 .contact-form {
@@ -583,7 +583,7 @@ h2 {
 label {
   display: flex;
   flex-direction: column;
-  font-size: 11px;
+  font-size: 14px;
   gap: 9px;
   margin-bottom: 18px;
 }
@@ -596,7 +596,7 @@ textarea {
   border-radius: 4px;
   color: var(--ink);
   width: 100%;
-  font-size: 12px;
+  font-size: 15px;
   outline: none;
 }
 input:focus,
@@ -611,12 +611,12 @@ textarea {
 input::placeholder,
 textarea::placeholder {
   color: #939a90;
-  font-size: 11px;
+  font-size: 14px;
 }
 .checkbox {
   flex-direction: row;
   align-items: flex-start;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.6;
   gap: 10px;
 }
@@ -630,7 +630,7 @@ textarea::placeholder {
   border: 0;
   padding: 0;
   text-decoration: underline;
-  font-size: 10px;
+  font-size: 13px;
   color: inherit;
 }
 .contact-form > .button {
@@ -638,7 +638,7 @@ textarea::placeholder {
   margin-top: 5px;
 }
 .contact-form > small {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--muted);
   display: block;
   margin-top: 15px;
@@ -667,14 +667,14 @@ footer {
 }
 .footer-main > span,
 .footer-main > a:last-child {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--muted);
 }
 .footer-bottom {
   border-top: 1px solid var(--line);
   margin-top: 30px;
   padding-top: 20px;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--muted);
 }
 .footer-bottom > div {
@@ -708,7 +708,7 @@ footer {
 }
 .modal p {
   line-height: 1.8;
-  font-size: 14px;
+  font-size: 16px;
 }
 .close {
   position: absolute;
@@ -719,7 +719,7 @@ footer {
   background: transparent;
 }
 .admin-shell header > span {
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 1px;
 }
 .login {
@@ -780,7 +780,7 @@ footer {
 }
 .message-item span,
 .message-item small {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--muted);
 }
 .message-body {
@@ -839,7 +839,7 @@ footer {
     padding: 20px;
   }
   .service h3 {
-    font-size: 16px;
+    font-size: 18px;
   }
   .footer-bottom > span:last-child {
     display: none;
@@ -855,7 +855,7 @@ footer {
     font-size: 23px;
   }
   .nav-contact {
-    font-size: 10px;
+    font-size: 13px;
     padding: 10px;
     gap: 10px;
   }
@@ -891,7 +891,7 @@ footer {
     letter-spacing: -3px;
   }
   .hero-copy > p {
-    font-size: 14px;
+    font-size: 16px;
   }
   .headline-star {
     font-size: 45px;
@@ -907,12 +907,12 @@ footer {
     gap: 16px;
   }
   .expertise-band > div {
-    font-size: 11px;
+    font-size: 14px;
     gap: 12px;
     flex-wrap: wrap;
   }
   .expertise-band b {
-    font-size: 15px;
+    font-size: 17px;
   }
   .section {
     padding: 55px 6%;
@@ -940,7 +940,7 @@ footer {
     font-size: 20px;
   }
   .service p {
-    font-size: 13px;
+    font-size: 16px;
   }
   .approach {
     margin: 0 6%;
@@ -1025,7 +1025,7 @@ footer {
   overflow-wrap: anywhere;
 }
 .contact-links a {
-  font-size: 13px;
+  font-size: 16px;
 }
 /* CodeNova — orbital identity */
 body {
@@ -1087,7 +1087,7 @@ nav a:hover,
 }
 .eyebrow {
   color: #b5add4;
-  font-size: 10px;
+  font-size: 13px;
   letter-spacing: 2px;
 }
 .hero .eyebrow {
@@ -1117,7 +1117,7 @@ h2 {
 }
 .hero-copy > p {
   line-height: 1.9;
-  font-size: 15px;
+  font-size: 17px;
   color: #a8aec7;
   max-width: 450px;
 }
@@ -1176,7 +1176,7 @@ h2 {
 .art-bottom {
   color: #7f8dab;
   font-family: monospace;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 1.2px;
 }
 .art-top {
@@ -1248,7 +1248,7 @@ h2 {
   box-shadow: 0 8px 30px #0004;
   color: #d1d7ef;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 13px;
   backdrop-filter: blur(12px);
   border-radius: 8px;
 }
@@ -1259,13 +1259,13 @@ h2 {
 }
 .tag-icon {
   color: #c792ff;
-  font-size: 14px;
+  font-size: 16px;
 }
 .tag-two {
   bottom: 95px;
   right: 15px;
   transform: rotate(4deg);
-  font-size: 9px;
+  font-size: 12px;
 }
 .code-window {
   position: absolute;
@@ -1300,7 +1300,7 @@ h2 {
 }
 .window-bar > span {
   margin-left: auto;
-  font-size: 8px;
+  font-size: 12px;
   color: #7e8aa8;
 }
 .code-lines {
@@ -1382,7 +1382,7 @@ h2 {
   font-size: 19px;
 }
 .service p {
-  font-size: 13px;
+  font-size: 16px;
   color: #9fa9c4;
 }
 .service-footer {
@@ -1445,7 +1445,7 @@ h2 {
 .about-visual > span {
   color: #7483a6;
   font-family: monospace;
-  font-size: 8px;
+  font-size: 12px;
   z-index: 2;
 }
 .about-tags span {
@@ -1626,17 +1626,17 @@ section[id] {
   .code-window {
     left: 22px;
     width: 235px;
-    font-size: 10px;
+    font-size: 13px;
   }
   .tag-two {
     right: 10px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .service {
     padding: 22px;
   }
   .service h3 {
-    font-size: 16px;
+    font-size: 18px;
   }
   .about {
     gap: 40px;
@@ -1659,7 +1659,7 @@ section[id] {
     height: 35px;
   }
   .nav-contact {
-    font-size: 9px;
+    font-size: 12px;
     padding: 10px 11px;
     max-width: 120px;
     gap: 10px;
@@ -1683,7 +1683,7 @@ section[id] {
     min-height: 0;
   }
   .hero .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 1.3px;
     padding: 9px 11px;
   }
@@ -1694,7 +1694,7 @@ section[id] {
     margin: 25px 0;
   }
   .hero-copy > p {
-    font-size: 14px;
+    font-size: 16px;
   }
   .hero-art {
     min-height: 440px;
@@ -1721,20 +1721,20 @@ section[id] {
   }
   .tag-one {
     top: 85px;
-    font-size: 9px;
+    font-size: 12px;
     padding: 10px;
   }
   .code-window {
     left: 20px;
     bottom: 62px;
     width: 230px;
-    font-size: 10px;
+    font-size: 13px;
   }
   .tag-two {
     bottom: 91px;
     right: 12px;
     padding: 9px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .art-top,
   .art-bottom {
@@ -1746,10 +1746,10 @@ section[id] {
     padding: 22px 6%;
   }
   .expertise-band > span {
-    font-size: 8px;
+    font-size: 12px;
   }
   .expertise-band > div {
-    font-size: 11px;
+    font-size: 14px;
     gap: 10px;
   }
   .section {
@@ -1821,4 +1821,63 @@ section[id] {
   .service:hover {
     transform: none;
   }
+}
+
+/* Comfortable reading and touch targets, including forms and the admin area. */
+body { font-size: 17px; line-height: 1.6; }
+nav a, .nav-contact, .text-link, .button { font-size: 16px; }
+.button, .nav-contact { min-height: 48px; }
+.button { padding: 14px 22px; }
+nav a { display: inline-flex; align-items: center; min-height: 44px; }
+.mobile-nav-contact { display: none; }
+.hero-copy > p, .contact-info > p { font-size: 18px; }
+.service p, .steps p, .about p, .approach-intro > p, .section-heading > p { font-size: 17px; line-height: 1.8; }
+.service h3, .steps h3 { font-size: 21px; line-height: 1.4; }
+label { font-size: 15px; }
+input, textarea, select { font-size: 16px; min-height: 48px; }
+input::placeholder, textarea::placeholder { font-size: 15px; }
+.checkbox, .inline-button { font-size: 14px; line-height: 1.7; }
+.checkbox input { min-height: 20px; width: 20px; height: 20px; margin-top: 2px; }
+.contact-form > small, .address small { font-size: 13px; }
+.contact-links a, .address a, .address address { font-size: 16px; }
+.footer-main > span, .footer-main > a:last-child, .footer-bottom { font-size: 14px; }
+.footer-bottom { flex-wrap: wrap; line-height: 1.8; }
+.footer-bottom > div { flex-wrap: wrap; gap: 12px 22px; }
+.footer-bottom a, .footer-bottom button { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; }
+.service-footer { line-height: 1.7; gap: 12px; }
+.service-footer > span { min-width: 0; }
+.service-footer a { flex-shrink: 0; display: grid; place-items: center; width: 44px; min-height: 44px; }
+.message-item span, .message-item small { font-size: 15px; }
+.message-item strong { font-size: 17px; }
+.message-detail, .message-body { font-size: 17px; }
+.code-window { font-size: 11px; }
+.art-top, .art-bottom { font-size: 10px; }
+@media(max-width:1100px) {
+ header { position: relative; }
+ .menu-button { display: block; border: 0; background: transparent; font-size: 26px; order: 3; min-width: 44px; min-height: 44px; }
+ nav { display: none; }
+ nav.open { display: flex; position: absolute; top: 100%; left: 0; right: 0; background: #101528fa; backdrop-filter: blur(16px); padding: 20px 6%; flex-direction: column; gap: 8px; border-bottom: 1px solid #a279e733; z-index: 8; }
+ nav.open a { font-size: 17px; }
+ .nav-contact { margin-left: auto; }
+}
+@media(max-width:700px) {
+ header { gap: 12px; }
+ header > .nav-contact { display: none; }
+ .menu-button { margin-left: auto; }
+ nav.open .mobile-nav-contact { display: inline-flex; color: #c3a2ff; }
+ .hero-copy > p, .contact-info > p { font-size: 17px; }
+ .hero-actions { align-items: flex-start; }
+ .hero-actions .button { gap: 12px; max-width: 100%; }
+ .hero .eyebrow { font-size: 10px; letter-spacing: 1px; }
+ .service p, .steps p, .about p, .approach-intro > p, .section-heading > p { font-size: 16px; }
+ .expertise-band > div { flex-wrap: wrap; gap: 8px 14px; font-size: 15px; }
+ .contact-form { padding: 22px; }
+ .contact-form h3 { font-size: 21px; }
+ .code-window { font-size: 10px; }
+ .art-top, .art-bottom { font-size: 8px; }
+ .tag-one { font-size: 10px; }
+ .tag-two { font-size: 9px; }
+ .hero-note { font-size: 14px; align-items: flex-start; }
+ .footer-main { align-items: flex-start; }
+ .admin-content .section-heading { align-items: flex-start; }
 }
