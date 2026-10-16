@@ -4,7 +4,7 @@ Configuration pour le VPS existant, sans changement de nom de projet Docker ni d
 
 ## Installer le certificat sur le VPS
 
-Conserver les fichiers reçus dans `/root/codenova-certificates/`, hors du dépôt. Ne jamais publier la clé privée, le PFX ou leur mot de passe. Nginx utilise le `.cer` et le `.key` ; le PFX n’est pas requis. Le certificat doit couvrir `codenova-solutions.fr` explicitement : un certificat pour le seul `*.codenova-solutions.fr` ne suffit pas.
+Conserver les fichiers reçus dans `/root/codenova-certificates/`, hors du dépôt. Ne jamais publier la clé privée, le PFX ou leur mot de passe. Nginx utilise le `.cer` et le `.key` ; le PFX n’est pas requis. Le certificat doit couvrir `codenova-solutions.fr` et `www.codenova-solutions.fr` (contrôlés par le script). Le domaine sans sous-domaine doit être couvert explicitement : un certificat pour le seul `*.codenova-solutions.fr` ne suffit pas.
 
 ```bash
 cd /opt/codenova-recette
@@ -73,3 +73,25 @@ docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profi
 ```
 
 Les fichiers sont montés par dossier, donc leur remplacement est visible sans reconstruire l’image. Sauvegarder les données existantes selon le README ; ne pas lancer `down -v` pour cette mise à jour.
+
+## Adresse www
+
+Chez le fournisseur DNS, ajouter `www` de type **CNAME**, cible **codenova-solutions.fr** (parfois avec un point final selon l’interface). Supprimer ou remplacer un éventuel enregistrement incompatible pour ce même nom ; un CNAME ne cohabite pas avec un A/AAAA sur `www`. Un A `www` vers `185.229.224.25` est une alternative si le fournisseur ne permet pas le CNAME.
+
+Le certificat installé doit couvrir les deux noms. Le wildcard `*.codenova-solutions.fr` couvre `www`, mais il faut aussi la couverture du domaine sans sous-domaine. Vérifier sur le VPS :
+
+```bash
+openssl x509 -in /etc/codenova/tls/fullchain.pem -noout -checkhost www.codenova-solutions.fr
+```
+
+La sortie doit indiquer **does match certificate**. Si le certificat ne couvre pas www, le faire réémettre avec les deux noms puis l’installer avec le script avant d’activer cette adresse. Attention : selon la version d’OpenSSL, `-checkhost` peut renvoyer un code zéro même si le nom ne correspond pas ; lire le résultat. Le script contrôle lui-même le résultat textuel.
+
+Après la mise à jour du dépôt, le fichier Nginx étant monté directement dans le conteneur, tester puis recharger sans reconstruction :
+
+```bash
+docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app exec web nginx -t
+docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app exec web nginx -s reload
+curl -I https://www.codenova-solutions.fr/
+```
+
+Réponse attendue : **308**, avec `Location: https://codenova-solutions.fr/`. Les chemins et paramètres sont conservés. L’adresse canonique, le sitemap et l’administration restent sur le domaine sans www. La connexion TLS est validée pour www avant la redirection ; ne pas contourner une erreur de certificat.

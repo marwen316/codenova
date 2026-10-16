@@ -18,7 +18,9 @@ openssl pkey -in "$2" -out "$tls_work_dir/private.key"
 openssl x509 -in "$tls_work_dir/certificate.pem" -pubkey -noout | openssl pkey -pubin -outform DER > "$tls_work_dir/cert-public.der"
 openssl pkey -in "$tls_work_dir/private.key" -pubout -outform DER > "$tls_work_dir/key-public.der"
 cmp -s "$tls_work_dir/cert-public.der" "$tls_work_dir/key-public.der" || { echo 'Le certificat et la clé ne correspondent pas.' >&2; exit 1; }
-openssl x509 -in "$tls_work_dir/certificate.pem" -checkhost codenova-solutions.fr -noout | grep -q 'does match certificate' || { echo 'Le certificat ne couvre pas codenova-solutions.fr.' >&2; exit 1; }
+for tls_hostname in codenova-solutions.fr www.codenova-solutions.fr; do
+ openssl x509 -in "$tls_work_dir/certificate.pem" -checkhost "$tls_hostname" -noout | grep -q 'does match certificate' || { echo "Le certificat ne couvre pas $tls_hostname." >&2; exit 1; }
+done
 openssl x509 -in "$tls_work_dir/certificate.pem" -checkend 86400 -noout || { echo 'Certificat expiré ou expirant dans moins de 24 heures.' >&2; exit 1; }
 # Preserve a supplied PEM bundle; for a DER certificate, use its converted leaf.
 if openssl x509 -in "$1" -noout >/dev/null 2>&1; then
