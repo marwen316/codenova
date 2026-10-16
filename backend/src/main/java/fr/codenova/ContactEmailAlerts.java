@@ -61,7 +61,7 @@ public class ContactEmailAlerts {
                 message.emailStatus=message.emailAttempts>=5?"FAILED":"PENDING";
                 message.emailNextAttempt=message.emailAttempts>=5?null:Instant.now().plusSeconds(60L<<(message.emailAttempts-1));
                 // Never log message contents, recipient addresses or SMTP exception details.
-                log.warn("Contact email alert failed for message {}, attempt {}; status {}",message.id,message.emailAttempts,message.emailStatus);
+                log.warn("Contact email alert failed for message {}, attempt {}; status {}; reason {}",message.id,message.emailAttempts,message.emailStatus,MailFailure.reason(error));
             }
             messages.save(message);
         }

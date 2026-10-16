@@ -54,3 +54,15 @@ Contrôler le mot de passe d’application, les adresses, les restrictions du co
 Pour désactiver, définir `CONTACT_ALERTS_ENABLED=false` puis recréer le backend. Les nouvelles demandes sont alors uniquement enregistrées dans l’administration. Les alertes déjà en attente restent en base et seront reprises si l’on réactive l’envoi. Les secrets SMTP sont des paramètres serveur, indépendants du contenu éditable du site.
 
 Un autre fournisseur SMTP peut être configuré avec les mêmes variables. Pour du TLS implicite en port 465, définir `SMTP_PORT=465`, `SMTP_SSL=true` et `SMTP_STARTTLS=false`, selon les instructions du fournisseur.
+
+Les échecs indiquent une catégorie `reason` sans publier la réponse SMTP complète :
+
+- `AUTHENTICATION_FAILED` : contrôler le compte SMTP et le mot de passe d’application Google (validation en deux étapes nécessaire), puis recréer le backend pour recharger `.env`.
+- `NETWORK_TIMEOUT` / `CONNECTION_FAILED` : vérifier la connectivité sortante du VPS vers le port SMTP choisi.
+- `DNS_FAILURE` : vérifier la résolution DNS du conteneur.
+- `TLS_ERROR` : vérifier l’heure du VPS, les certificats et le couple port/STARTTLS/SSL ; ne pas désactiver la vérification TLS.
+- `SMTP_REJECTED` : vérifier l’adresse expéditrice, le destinataire et les règles du fournisseur.
+- `INVALID_ADDRESS_OR_CONFIGURATION` : vérifier le format des adresses.
+- `SMTP_ERROR` : échec non classé nécessitant un diagnostic SMTP complémentaire ; ne pas transmettre les identifiants ou activer le debug SMTP public.
+
+Une alerte en `FAILED` ne se relance pas automatiquement au redémarrage. Après correction SMTP, effectuer le test avec un nouveau message de contact ; les anciens messages restent consultables dans l’administration.
