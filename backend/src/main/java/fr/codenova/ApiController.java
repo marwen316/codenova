@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.*;
 import java.util.*;
 @RestController @RequestMapping("/api") public class ApiController {
+@org.springframework.beans.factory.annotation.Value("${app.contact-alerts.enabled:false}") private boolean contactAlertsEnabled;
 private final MessageRepository messages; private final ContentRepository content;
 private final Map<String,Deque<Instant>> attempts=new HashMap<>();
 public ApiController(MessageRepository m,ContentRepository c){messages=m;content=c;}
@@ -21,7 +22,7 @@ public record Content(@NotBlank @Size(max=100) String headline,@NotBlank @Size(m
 @PostMapping("/contact") @ResponseStatus(HttpStatus.CREATED) public void contact(@Valid @RequestBody Contact input,HttpServletRequest request){
 if(input.website()!=null&&!input.website().isBlank())return;
 limit(request.getRemoteAddr());
-ContactMessage m=new ContactMessage();m.name=input.name().strip();m.email=input.email().strip();m.company=input.company()==null?"":input.company().strip();m.subject=input.subject();m.message=input.message().strip();m.createdAt=Instant.now();messages.save(m);
+ContactMessage m=new ContactMessage();m.name=input.name().strip();m.email=input.email().strip();m.company=input.company()==null?"":input.company().strip();m.subject=input.subject();m.message=input.message().strip();m.createdAt=Instant.now();if(contactAlertsEnabled){m.emailStatus="PENDING";m.emailNextAttempt=m.createdAt;}messages.save(m);
 }
 private synchronized void limit(String ip){Instant cutoff=Instant.now().minusSeconds(3600);attempts.values().forEach(q->{while(!q.isEmpty()&&q.peekFirst().isBefore(cutoff))q.removeFirst();});attempts.entrySet().removeIf(e->e.getValue().isEmpty());if(attempts.size()>10000&&!attempts.containsKey(ip))throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);Deque<Instant> q=attempts.computeIfAbsent(ip,k->new ArrayDeque<>());if(q.size()>=5)throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS);q.addLast(Instant.now());}
 @GetMapping("/admin/messages") public List<ContactMessage> list(){return messages.findAllByOrderByCreatedAtDesc();}

@@ -152,3 +152,7 @@ Le remplacement d’une image conserve son ancien fichier dans la bibliothèque 
 ## Domaine et HTTPS de production
 
 La configuration de **https://codenova-solutions.fr** est disponible dans [docs/https.md](docs/https.md) : installation et vérification des certificats fournis, redirection HTTP, déploiement Docker avec conservation des données, cookies Secure et renouvellement. Utiliser `compose.yaml` + `compose.https.yaml` avec le projet existant `codenova-recette`, à la place de l’override de recette HTTP.
+
+## Alertes e-mail de contact
+
+Un nouveau message peut déclencher une notification e-mail via SMTP, avec réponse directe au visiteur. Les alertes sont désactivées par défaut et conservent une file persistante avec cinq tentatives maximum ; le formulaire reste opérationnel en cas de panne mail. Voir [docs/email-alerts.md](docs/email-alerts.md) pour configurer Gmail (mot de passe d’application) ou un autre fournisseur, déployer et vérifier la réception.
