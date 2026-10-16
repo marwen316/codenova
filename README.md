@@ -25,7 +25,7 @@ Le script d’installation installe les dépendances, compile les deux applicati
 
 Le script de développement attend la disponibilité réelle de l’API avant de lancer Angular sur le port 4200. L’API utilise le port 8080 ; PostgreSQL, 5432. Les logs de l’API sont dans `/tmp/codenova-api.log`.
 
-Le `.env` local est créé avec des mots de passe aléatoires. Les identifiants de l’administration sont les champs `ADMIN_USERNAME` et `ADMIN_PASSWORD` de ce fichier : les consulter localement, sans les publier. Pour changer le mot de passe, modifier ce fichier puis redémarrer l’API. Ne pas utiliser les valeurs d’exemple de `.env.example` en production.
+Le `.env` local est créé avec des mots de passe aléatoires. Les identifiants de l’administration sont les champs `ADMIN_USERNAME` et `ADMIN_PASSWORD` de ce fichier : les consulter localement, sans les publier. Aucune longueur minimale n’est imposée au mot de passe administrateur. Pour le changer, modifier ce fichier puis recréer le conteneur backend afin de recharger son environnement (un simple `docker restart` ne suffit pas). Ne pas utiliser les valeurs d’exemple de `.env.example` en production.
 
 Chaque tâche cloud est déjà isolée : utiliser ce checkout, sans créer de worktree sauf demande explicite. Les fichiers installés persistent, les processus doivent être relancés.
 
