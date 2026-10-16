@@ -148,3 +148,7 @@ Formats acceptés : PNG, JPEG et SVG simples, au maximum 4 Mo et 16 millions de 
 Les métadonnées sont conservées dans PostgreSQL (migration Flyway V3), et les fichiers dans le volume Docker `codenova-recette_media_data` monté dans `/app/media`. **Sauvegarder la base et ce volume ensemble** ; ne pas utiliser `docker compose down -v` pour une simple mise à jour. Le conteneur de production utilise l’UID/GID stable 10001, et son dossier de médias est préparé avec les droits correspondants. Le profil de recette automatisé a son propre volume et une initialisation explicite des permissions. En développement hors Docker, les médias sont dans `.local/media` (ignoré par Git), ou le dossier défini par `MEDIA_DIR`.
 
 Le remplacement d’une image conserve son ancien fichier dans la bibliothèque jusqu’à suppression explicite. Une image déjà ouverte dans un onglet doit être rechargée pour recevoir la nouvelle sélection. L’image de partage est actualisée dans les métadonnées du navigateur ; les limites du HTML prérendu décrites plus haut restent applicables aux robots de partage sans JavaScript.
+
+## Domaine et HTTPS de production
+
+La configuration de **https://codenova-solutions.fr** est disponible dans [docs/https.md](docs/https.md) : installation et vérification des certificats fournis, redirection HTTP, déploiement Docker avec conservation des données, cookies Secure et renouvellement. Utiliser `compose.yaml` + `compose.https.yaml` avec le projet existant `codenova-recette`, à la place de l’override de recette HTTP.

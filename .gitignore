@@ -8,3 +8,11 @@ target/
 test-results/
 playwright-report/
 .local/
+
+# TLS certificates and private keys stay on the server.
+*.key
+*.pfx
+*.p12
+*.pem
+*.cer
+*.crt

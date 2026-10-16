@@ -1,0 +1,18 @@
+# Use with compose.yaml, keeping the existing Compose project name.
+# Do not combine with compose.recette.yaml: this replaces its public HTTP port.
+services:
+  db:
+    ports: !reset []
+  backend:
+    environment:
+      COOKIE_SECURE: "true"
+  web:
+    build:
+      args:
+        SITE_URL: https://codenova-solutions.fr
+    ports: !override
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - ./frontend/nginx.https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${TLS_DIR:-/etc/codenova/tls}:/etc/nginx/tls:ro
