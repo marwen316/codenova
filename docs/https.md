@@ -86,11 +86,11 @@ openssl x509 -in /etc/codenova/tls/fullchain.pem -noout -checkhost www.codenova-
 
 La sortie doit indiquer **does match certificate**. Si le certificat ne couvre pas www, le faire réémettre avec les deux noms puis l’installer avec le script avant d’activer cette adresse. Attention : selon la version d’OpenSSL, `-checkhost` peut renvoyer un code zéro même si le nom ne correspond pas ; lire le résultat. Le script contrôle lui-même le résultat textuel.
 
-Après la mise à jour du dépôt, le fichier Nginx étant monté directement dans le conteneur, tester puis recharger sans reconstruction :
+Après la mise à jour du dépôt, valider la configuration puis recréer uniquement le conteneur web sans reconstruire son image. La recréation garantit que le montage prend bien le nouveau fichier après le remplacement effectué par Git :
 
 ```bash
-docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app exec web nginx -t
-docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app exec web nginx -s reload
+docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app run --rm --no-deps web nginx -t
+docker compose -p codenova-recette -f compose.yaml -f compose.https.yaml --profile app up -d --no-deps --force-recreate web
 curl -I https://www.codenova-solutions.fr/
 ```
 
